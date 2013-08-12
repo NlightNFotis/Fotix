@@ -1,0 +1,5 @@
+INSTRUCTIONS AND NOTES:
+
+I should have a cross compiler built (along with binutils)
+ - There is one at earth. It is under $HOME/bin/cross/
+ - To use it for the session I have to do `export PATH="$HOME/bin/cross/bin:$PATH"`
