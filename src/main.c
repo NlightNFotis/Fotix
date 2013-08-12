@@ -5,9 +5,17 @@
  * and also calls initialization routines.
  */
 
+#include "common.h"
+#include "monitor.h"
+
 int
 main (struct multiboot *mboot_ptr)
 {
-    // All our initialization code goes here :)
+    /* Clear the screen from previous artifacts. */
+    monitor_clear ();
+
+    /* Print a hello world like string to the screen. */
+    monitor_write ("Hello, from Fotix.\n");
+
     return 0xDEADBABA;
 }

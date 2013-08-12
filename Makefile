@@ -3,7 +3,7 @@
 
 CC=i586-elf-gcc
 
-SOURCES=src/boot.o src/main.o
+SOURCES=src/boot.o src/main.o src/common.o src/monitor.o
 CFLAGS=-nostdlib -nostdinc -fno-builtin -fno-stack-protector -m32
 LDFLAGS=-melf_i386 -Tlink.ld
 ASFLAGS=-felf
@@ -11,7 +11,7 @@ ASFLAGS=-felf
 all: $(SOURCES) link
 
 clean:
-	-rm src/*.o src/kernel
+	-rm src/*.o kernel
 
 link:
 	ld $(LDFLAGS) -o kernel $(SOURCES)
