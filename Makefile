@@ -3,7 +3,7 @@
 
 CC=i586-elf-gcc
 
-SOURCES=src/boot.o src/main.o src/common.o src/monitor.o
+SOURCES=src/boot.o src/main.o src/common.o src/monitor.o src/isr.o src/dt_asm.o src/descriptor_tables.o src/interrupt.o
 CFLAGS=-nostdlib -nostdinc -fno-builtin -fno-stack-protector -m32
 LDFLAGS=-melf_i386 -Tlink.ld
 ASFLAGS=-felf

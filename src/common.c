@@ -28,3 +28,11 @@ inw (u16int port)
     asm volatile ("inw %1, %0" : "=a" (ret) : "dN" (port));
     return ret;
 }
+
+/* Fill block of memory. */
+void 
+memset (u8int *mem_to_be_set, u8int value, u32int num)
+{
+    u8int *temp = (u8int *)mem_to_be_set;
+    for ( ; num != 0; num--) *temp++ = num;
+}
