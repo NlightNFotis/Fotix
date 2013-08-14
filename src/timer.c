@@ -22,8 +22,6 @@ timer_callback (registers_t reg)
 void
 init_timer (u32int frequency)
 {
-    monitor_write ("Initializing timer.");
-
     /* Firstly register our timer callback. */
     register_interrupt_handler (IRQ0, &timer_callback);
 

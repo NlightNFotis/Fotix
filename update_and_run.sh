@@ -12,4 +12,8 @@ sudo umount /dev/loop0
 sudo losetup /dev/loop0
 
 # Initialize QEMU with our image
-qemu -fda /dev/loop0 --boot a -no-fd-bootchk &
+qemu -fda /dev/loop0 --boot a -no-fd-bootchk
+
+# unmount the drive after QEMU has run
+sudo umount /dev/loop0
+sudo umount /mnt/kernel

@@ -5,6 +5,9 @@
  * are going to be used to implement the GDT.
  */
 
+#ifndef DESCRIPTOR_TABLES_H
+#define DESCRIPTOR_TABLES_H
+
 #include "common.h"
 
 /* 
@@ -18,10 +21,10 @@ struct gdt_entry_struct
 {
     u16int limit_low;       /* The lower 16 bits of the limit */
     u16int base_low;        /* The lower 16 bits of the base */
-    u8int base_middle;      /* The next 8 bits of the base */
-    u8int access;           /* Access flags, determine what ring this segment can be used in */
-    u8int granularity;
-    u8int base_high;        /* The last 8 bits of the base */
+    u8int  base_middle;      /* The next 8 bits of the base */
+    u8int  access;           /* Access flags, determine what ring this segment can be used in */
+    u8int  granularity;
+    u8int  base_high;        /* The last 8 bits of the base */
 } __attribute__((packed)); /* Used to tell GCC not to change the alignment in the structure */
 
 /* To tell the processor where to find our GDT, we have to
@@ -39,9 +42,6 @@ struct gdt_ptr_struct
 typedef struct gdt_entry_struct gdt_entry_t;
 typedef struct gdt_ptr_struct gdt_ptr_t;
 
-/* Initialisation function is publicly accessible. */
-void init_descriptor_tables ();
-
 /*
  * ---------------------------------
  *  INTERRUPT DESCRIPTOR TABLE
@@ -53,8 +53,8 @@ struct idt_entry_struct
 {
     u16int base_lo;     /* The lower 16bits of the address to jump to when this interrupt fires */
     u16int sel;         /* The kernel segment selector. */
-    u8int always_zero;      /* This must always be zero. */
-    u8int flags;        
+    u8int  always_zero;      /* This must always be zero. */
+    u8int  flags;        
     u16int base_hi;     /* The upper 16 bits of the address to jump to. */
 } __attribute__((packed));
 
@@ -120,3 +120,8 @@ extern void irq12 ();
 extern void irq13 ();
 extern void irq14 ();
 extern void irq15 ();
+
+/* Initialisation function is publicly accessible. */
+void init_descriptor_tables ();
+
+#endif

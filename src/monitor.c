@@ -155,21 +155,22 @@ monitor_write (char *c)
         }
 }
 
-void monitor_write_dec(u32int n)
+void 
+monitor_write_dec (u32int number)
 {
 
-    if (n == 0)
+    if (number == 0)
     {
-        monitor_put('0');
+        monitor_put ('0');
         return;
     }
 
-    s32int acc = n;
+    s32int acc = number;
     char c[32];
     int i = 0;
     while (acc > 0)
     {
-        c[i] = '0' + acc%10;
+        c[i] = '0' + acc % 10;
         acc /= 10;
         i++;
     }
@@ -182,6 +183,47 @@ void monitor_write_dec(u32int n)
     {
         c2[i--] = c[j++];
     }
-    monitor_write(c2);
+    monitor_write (c2);
 
+}
+
+void
+monitor_write_hex (u32int number)
+{
+    s32int temp;
+
+    monitor_write ("0x");
+
+    u8int noZeroes = 1;
+
+    int counter;
+    for (counter = 28; counter > 0; counter -= 4)
+        {
+            temp = (number >> counter) & 0xF;
+            if (temp == 0 && noZeroes != 0)
+                {
+                    continue;
+                }
+
+            if (temp >= 0xA)
+                {
+                    noZeroes = 0;
+                    monitor_put (temp - 0xA + 'a');
+                }
+            else
+                {
+                    noZeroes = 0;
+                    monitor_put (temp + '0');
+                }
+        }
+
+    temp = number & 0xF;
+    if (temp >= 0xA)
+        {
+            monitor_put (temp - 0xA + 'a');
+        }
+    else
+        {
+            monitor_put (temp + '0');
+        }
 }

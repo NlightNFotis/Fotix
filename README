@@ -6,5 +6,5 @@ I should have a cross compiler built (along with binutils)
 
 
 TODO:
- - I have to implement memset, memcpy, strlen, strcmp, etc and put them in common.c and common.h
+ - I have to implement memcpy, strlen, strcmp, etc and put them in common.c and common.h
  - Apart from those I should also implement monitor_write_hex(u32int) and monitor_write_dec(u32int)

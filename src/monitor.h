@@ -21,4 +21,7 @@ void monitor_write (char *c);
 /* Output a decimal number on the monitor */
 void monitor_write_dec (u32int number);
 
+/* Output a hexadecimal number on the monitor */
+void monitor_write_hex (u32int hex_number);
+
 #endif

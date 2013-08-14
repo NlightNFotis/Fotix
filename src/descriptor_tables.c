@@ -7,6 +7,7 @@
 
 #include "common.h"
 #include "descriptor_tables.h"
+#include "isr.h"
 
 /* Let's us access our ASM functions from our C code. */
 extern void gdt_flush (u32int);
@@ -23,16 +24,22 @@ gdt_ptr_t   gdt_ptr;
 idt_entry_t idt_entries[256];
 idt_ptr_t   idt_ptr;
 
+/* Extern the ISR handler array so we can nullify them on startup. */
+extern isr_t interrupt_handlers[];
+
 /* Initialisation routine - zeroes all the interrupt service routines,
  * initialises the GDT and IDT */
 void
 init_descriptor_tables ()
 {
-    /* Initialise the Global Descriptor Table. */
+	/* Initialise the Global Descriptor Table. */
     init_gdt ();
 
     /* Initialise the Interrupt Descriptor Table. */
     init_idt ();
+
+	/* Nullify all the interrupt handlers. */
+    memset(&interrupt_handlers, 0, sizeof(isr_t) * 256);
 }
 
 static void 
@@ -59,7 +66,7 @@ gdt_set_gate (s32int num, u32int base, u32int limit,
 {
     gdt_entries[num].base_low    = (base & 0xFFFF);
     gdt_entries[num].base_middle = (base >> 16) & 0xFF;
-    gdt_entries[num].base_middle = (base >> 24) & 0xFF;
+    gdt_entries[num].base_high   = (base >> 24) & 0xFF;
 
     gdt_entries[num].limit_low   = (limit & 0xFFFF);
     gdt_entries[num].granularity = (limit >> 16) & 0x0F;

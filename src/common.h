@@ -22,4 +22,9 @@ u16int  inw (u16int port);
 
 void memset (u8int *, u8int, u32int);
 
+#define PANIC(msg) panic(msg, __FILE__, __LINE__);
+
+extern void panic (const char *message, const char *file, u32int line);
+extern void panic_assert(const char *file, u32int line, const char *desc);
+
 #endif
