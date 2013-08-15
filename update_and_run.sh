@@ -2,18 +2,16 @@
 # Script to update the kernel image and run fotix
 # Copyright (C) 2013 Fotis Koutoulakis
 
-# Updating the image stored in the floppy disk drive
-# dd if=kernel of=/dev/fd0
-
-sudo losetup /dev/loop0 floppy.img
-sudo mount /dev/loop0 /mnt
-sudo cp kernel /mnt/kernel
-sudo umount /dev/loop0
-sudo losetup /dev/loop0
+mkdir -p isodir/
+mkdir -p isodir/boot
+cp kernel isodir/boot/fotix
+mkdir -p isodir/boot/grub
+cp grub.cfg isodir/boot/grub/grub.cfg
+grub-mkrescue -o fotix.iso isodir
 
 # Initialize QEMU with our image
-qemu -fda /dev/loop0 --boot a -no-fd-bootchk
+qemu-system-i386 -cdrom fotix.iso
 
-# unmount the drive after QEMU has run
-sudo umount /dev/loop0
-sudo umount /mnt/kernel
+# Cleaning up after qemu has run
+rm -rf isodir/
+rm fotix.iso
