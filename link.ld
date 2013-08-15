@@ -1,11 +1,13 @@
 /* Link.ld -- Linker script for fotix
  *
- * Copyright (c) 2013 Fotis Koutoulakis */
+ * Copyright (c) 2013 Fotis Koutoulakis 
+ */
 
 ENTRY(start)
 SECTIONS
 {
-    .text 0x100000:
+
+    .text 0x100000 :
     {
         code = .; _code = .; __code = .;
         *(.text)

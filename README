@@ -1,3 +1,9 @@
+fotix is a unix like clone.
+Copyright (c) 2013 Fotis Koutoulakis
+
+Features:
+ - Interrupt handling.
+
 INSTRUCTIONS AND NOTES:
 
 I should have a cross compiler built (along with binutils)

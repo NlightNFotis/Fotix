@@ -2,7 +2,8 @@
 # Copyright (c) 2013 Fotis Koutoulakis
 
 SOURCES=src/boot.o src/main.o src/common.o src/monitor.o src/descriptor_tables.o \
-	src/isr.o src/interrupt.o src/dt_asm.o src/timer.o src/kheap.o src/paging.o
+	src/isr.o src/interrupt.o src/dt_asm.o src/timer.o src/kheap.o src/paging.o \
+	src/ordered_array.o
 
 CFLAGS=-nostdlib -nostdinc -fno-builtin -fno-stack-protector -m32
 LDFLAGS=-melf_i386 -Tlink.ld
