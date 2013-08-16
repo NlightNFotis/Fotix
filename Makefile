@@ -3,7 +3,7 @@
 
 SOURCES=src/boot.o src/main.o src/common.o src/monitor.o src/descriptor_tables.o \
 	src/isr.o src/interrupt.o src/dt_asm.o src/timer.o src/kheap.o src/paging.o \
-	src/ordered_array.o
+	src/ordered_array.o src/fs.o src/initrd.o
 
 CFLAGS=-nostdlib -nostdinc -fno-builtin -fno-stack-protector -m32
 LDFLAGS=-melf_i386 -Tlink.ld
