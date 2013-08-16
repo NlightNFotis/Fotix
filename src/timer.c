@@ -7,6 +7,7 @@
 #include "timer.h"
 #include "isr.h"
 #include "monitor.h"
+#include "task.h"
 
 u32int tick = 0;
 
@@ -14,9 +15,7 @@ static void
 timer_callback (registers_t reg)
 {
     tick++;
-    monitor_write ("Tick: ");
-    monitor_write_dec (tick);
-    monitor_write("\n");
+    switch_task ();
 }
 
 void

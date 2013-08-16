@@ -12,16 +12,25 @@
 #include "multiboot.h"
 #include "fs.h"
 #include "initrd.h"
+#include "task.h"
 
 extern u32int placement_address;
 
+u32int initial_esp;
+
 int
-main (struct multiboot *mboot_ptr)
+main (struct multiboot *mboot_ptr, u32int initial_stack)
 {
+    initial_esp = initial_stack;
+
     /* Initialise all the ISRs and segmentation */
     init_descriptor_tables ();
     /* Initialise the screen (by clearing it) */
     monitor_clear ();
+
+    /* Initialise the PIT to 100Hz */
+    asm volatile ("sti");
+    init_timer (50);
 
     /* Print a hello world like string to the screen. */
     monitor_write ("Hello, from Fotix.\n");
@@ -39,9 +48,25 @@ main (struct multiboot *mboot_ptr)
     /* Initialise paging. */
     initialise_paging ();
 
+    /* Initialise multitasking */
+    initialise_tasking ();
+
     /* Initialise the initial ramdisk, and set it as the filesystem root. */
     fs_root = initialise_initrd (initrd_location);
     
+    /* Create a new process in a new address space which is a clone of this */
+    int ret = fork ();
+
+    monitor_write ("fork() returned ");
+    monitor_write_hex (ret);
+    monitor_write (", and getpid() returned ");
+    monitor_write_hex(getpid ());
+    monitor_write("\n=====================================================\n");
+
+    /* The next section of code is not reentrant, so make sure we are not interrupted
+     * during it. */
+    asm volatile ("cli");
+
     /* Test the ramdisk */
     int counter;
     struct dirent *node = 0;
@@ -67,7 +92,9 @@ main (struct multiboot *mboot_ptr)
 
           counter++;
       }
-                
+    monitor_write ("\n");
+
+    asm volatile ("sti");
 
     return 0;
 }

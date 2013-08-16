@@ -34,7 +34,9 @@ mboot:
 [EXTERN main]               ; This is the entry point of our C Code
 
 start:
-    push ebx                ; Load multiboot header location
+    ; Load multiboot information:
+    push esp
+    push ebx
 
     ; Execute the kernel:
     cli                     ; Disable all interrupts.
