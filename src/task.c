@@ -45,6 +45,139 @@ initialise_tasking ()
     asm volatile ("sti");
 }
 
+void
+move_stack (void *new_stack_start, u32int size)
+{
+    u32int counter;
+
+    /* Allocate some space for the new stack. */
+    for (counter = (u32int) new_stack_start;
+         counter >= ((u32int) new_stack_start - size);
+         counter -= 0x1000);
+      {
+          /* General purpose stack is in user-mode. */
+          alloc_frame (get_page (counter, 1, current_directory), 0 /* User mode */, 1 /* Is writable */);
+      }
+
+    /* Flush the TLB (translation lookaside buffer) by reading
+     * and writing the page directory address again.
+     */
+    u32int pd_addr;
+    asm volatile ("mov %%cr3, %0" : "=r" (pd_addr));
+    asm volatile ("mov %0, %%cr3" : : "r" (pd_addr));
+
+    /* Old esp, and ebp, read from registers */
+    u32int old_stack_pointer; asm volatile ("mov %%esp, %0" : "=r" (old_stack_pointer));
+    u32int old_base_pointer;  asm volatile ("mov %%ebp, %0" : "=r" (old_base_pointer));
+
+    /* New ESP and EBP */
+    u32int offset            = (u32int) new_stack_start - initial_esp;
+    u32int new_stack_pointer = old_stack_pointer + offset;
+    u32int new_base_pointer  = old_base_pointer + offset;
+
+    /* Copy the stack */
+    memcpy ((void *) new_stack_pointer, (void *) old_stack_pointer, initial_esp - old_stack_pointer);
+
+
+    /* XXX: We assume that any value on the stack which is in the range of the
+     * stack (old_stack_pointer < x < initial_esp) is a pushed EBP. This will
+     * unfortunately, completely trash any value which isn't an EBP but just
+     * happens to be in range.
+     */
+
+    /* Backtrace through the original stack, copying new values into
+     * the new stack.
+     */
+    for (counter = (u32int) new_stack_start; 
+            counter > (u32int) new_stack_start - size; counter -= 4)
+      {
+          u32int tmp = * (u32int *) counter;
+          
+          /* If the value of tmp is inside the range of the old stack, we assume it is a
+           * base pointer and remap it. This will unfortunatelly remap ANY value
+           * in this range, whether they are base pointer or not.
+           */
+          if ((old_stack_pointer < tmp) && (tmp < initial_esp))
+            {
+                tmp = tmp + offset;
+                u32int *tmp2 = (u32int *) counter;
+                *tmp2 = tmp;
+            }
+      }
+
+    /* Change stacks */
+    asm volatile ("mov %0, %%esp" : : "r" (new_stack_pointer));
+    asm volatile ("mov %0, %%ebp" : : "r" (new_base_pointer));
+}
+
+void 
+switch_task ()
+{
+    /* Because this function will be called whenever the timer fires, it is
+     * very posslbe that it will be called before initialise_tasking has been
+     * called. So we check that here - if the current task is NULL, just return. 
+     */
+    if (!current_task)
+        return;
+
+    /* Read esp, ebp now for saving later on */
+    u32int esp, ebp, eip;
+    asm volatile ("mov %%esp, %0" : "=r"(esp));
+    asm volatile ("mov %%ebp, %0" : "=r"(ebp));
+    
+    /* Read the instruction pointer. We do some cunning logic here:
+     * One of two things could have happened when this function exits - 
+     * (a) We called the function and it returned the EIP as requested.
+     * (b) We have just switched tasks, and because the saved EIP is essentially
+     * the instruction after read_eip (), it will seem as if read_eip has just
+     * returned.
+     * In the second case we need to return immediately. To detect it we put a
+     * dummy value in EAX further down at the end of this function. As C returns
+     * values in EAX, it will look like the return value is this dummy value (0x12345)
+     */
+    eip = read_eip ();
+    
+    /* Have we just switched tasks? */
+    if (eip == 0x12345)
+        return;
+
+    /* No we didn't switch tasks. Let's save some register values and switch. */
+    current_task->eip = eip;
+    current_task->esp = esp;
+    current_task->ebp = ebp;
+
+    /* Get the next task to run. */
+    current_task = current_task->next;
+    /* If we fell off the end of the linked list, start again at the beggining. */
+    if (!current_task) current_task = ready_queue;
+
+    eip = current_task->eip;
+    esp = current_task->esp;
+    ebp = current_task->ebp;
+
+    /* Here we:
+     * - Stop interrupts so we don't get interrupted.
+     * - Temporarily put the new EIP location in ECX.
+     * - Load the stack and base pointers from the new task struct
+     * - Change page directory to the physical address of the new directory
+     * - Put a dummy value (0x12345) in EAX so that above we can recognise
+     * that we've just switched task.
+     * - Restart interrupts. The STI instruction has a delay - it doesn't take
+     * effect until after the next instruction
+     * - Jump to the location in ECX (remember we put the new EIP there)
+     */
+    asm volatile ("             \
+            cli;                \
+            mov %0, %%ecx;      \
+            mov %1, %%esp;      \
+            mov %2, %%ebp;      \
+            mov %3, %%cr3;      \
+            mov $0x12345, %%eax;\
+            sti;                \
+            jmp *%%ecx          "
+            : : "r"(eip), "r"(esp), "r"(ebp), "r"(current_directory->physicalAddr));
+}
+
 /* Fork() is a UNIX function to create a new process.
  * It clones the address space and starts the new process running at the same place
  * as the original process is currently at.
@@ -52,6 +185,8 @@ initialise_tasking ()
 int
 fork ()
 {
+	monitor_write ("[DEBUG] Inside fork()\n");
+	
     /* We are modifying kernel structures, and so cannot be interrupted */
     asm volatile ("cli");
 
@@ -100,137 +235,6 @@ fork ()
           /* We are the child; by convention return 0 */
           return 0;
       }
-}
-
-void 
-switch_task ()
-{
-    /* Because this function will be called whenever the timer fires, it is
-     * very posslbe that it will be called before initialise_tasking has been
-     * called. So we check that here - if the current task is NULL, just return. 
-     */
-    if (!current_task)
-        return;
-
-    /* Read esp, ebp now for saving later on */
-    u32int esp, ebp, eip;
-    asm volatile ("mov %%esp, %0" : "=r"(esp));
-    asm volatile ("mov %%ebp, %0" : "=r"(ebp));
-    
-    /* Read the instruction pointer. We do some cunning logic here:
-     * One of two things could have happened when this function exits - 
-     * (a) We called the function and it returned the EIP as requested.
-     * (b) We have just switched tasks, and because the saved EIP is essentially
-     * the instruction after read_eip (), it will seem as if read_eip has just
-     * returned.
-     * In the second case we need to return immediately. To detect it we put a
-     * dummy value in EAX further down at the end of this function. As C returns
-     * values in EAX, it will look like the return value is this dummy value (0x12345)
-     */
-    eip = read_eip ();
-    
-    /* Have we just switched tasks? */
-    if (eip == 0x12345)
-        return;
-
-    /* No we didn't switch tasks. Let's save some register values and switch. */
-    current_task->eip = eip;
-    current_task->esp = esp;
-    current_task->ebp = ebp;
-
-    /* Get the next task to run. */
-    current_task = current_task->next;
-    /* If we fell off the end of the linked list, start again at the beggining. */
-    if (!current_task) current_task = ready_queue;
-
-    esp = current_task->esp;
-    ebp = current_task->ebp;
-
-    /* Here we:
-     * - Stop interrupts so we don't get interrupted.
-     * - Temporarily put the new EIP location in ECX.
-     * - Load the stack and base pointers from the new task struct
-     * - Change page directory to the physical address of the new directory
-     * - Put a dummy value (0x12345) in EAX so that above we can recognise
-     * that we've just switched task.
-     * - Restart interrupts. The STI instruction has a delay - it doesn't take
-     * effect until after the next instruction
-     * - Jump to the location in ECX (remember we put the new EIP there)
-     */
-    asm volatile ("             \
-            cli;                \
-            mov %0, %%ecx;      \
-            mov %1, %%esp;      \
-            mov %2, %%ebp;      \
-            mov %3, %%cr3;      \
-            mov $0x12345, %%eax;\
-            sti;                \
-            jmp *%%ecx          "
-            : : "r"(eip), "r"(esp), "r"(ebp), "r"(current_directory->physicalAddr));
-}
-
-void
-move_stack (void *new_stack_start, u32int size)
-{
-    u32int counter;
-
-    /* Allocate some space for the new stack. */
-    for (counter = (u32int) new_stack_start;
-         counter >= ((u32int) new_stack_start - size);
-         counter -= 0x1000);
-      {
-          /* General purpose stack is in user-mode. */
-          alloc_frame (get_page (counter, 1, current_directory), 0 /* User mode */, 1 /* Is writable */);
-      }
-
-    /* Flush the TLB (translation lookaside buffer) by reading
-     * and writing the page directory address again.
-     */
-    u32int pd_addr;
-    asm volatile ("mov %%cr3, %0" : "=r" (pd_addr));
-    asm volatile ("mov %0, %%cr3" : : "r" (pd_addr));
-
-    /* Old esp, and ebp, read from registers */
-    u32int old_stack_pointer; asm volatile ("mov %%esp, %0" : "=r" (old_stack_pointer));
-    u32int old_base_pointer;  asm volatile ("mov %%ebp, %0" : "=r" (old_base_pointer));
-
-    u32int offset            = (u32int) new_stack_start - initial_esp;
-    u32int new_stack_pointer = old_stack_pointer + offset;
-    u32int new_base_pointer  = old_base_pointer + offset;
-
-    /* Copy the stack */
-    memcpy ((void *) new_stack_pointer, (void *) old_stack_pointer, initial_esp - old_stack_pointer);
-
-
-    /* XXX: We assume that any value on the stack which is in the range of the
-     * stack (old_stack_pointer < x < initial_esp) is a pushed EBP. This will
-     * unfortunately, completely trash any value which isn't an EBP but just
-     * happens to be in range.
-     */
-
-    /* Backtrace through the original stack, copying new values into
-     * the new stack.
-     */
-    for (counter = (u32int) new_stack_start; 
-            counter > (u32int) new_stack_start - size; counter -= 4)
-      {
-          u32int tmp = * (u32int *) counter;
-          
-          /* If the value of tmp is inside the range of the old stack, we assume it is a
-           * base pointer and remap it. This will unfortunatelly remap ANY value
-           * in this range, whether they are base pointer or not.
-           */
-          if ((old_stack_pointer < tmp) && (tmp < initial_esp))
-            {
-                tmp = tmp + offset;
-                u32int *tmp2 = (u32int *) counter;
-                *tmp2 = tmp;
-            }
-      }
-
-    /* Change stacks */
-    asm volatile ("mov %0, %%esp" : : "r" (new_stack_pointer));
-    asm volatile ("mov %0, %%ebp" : : "r" (new_base_pointer));
 }
 
 int
