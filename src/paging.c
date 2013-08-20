@@ -70,7 +70,7 @@ first_frame ()
             for (j = 0; j < 32; j++)
             {
                 u32int toTest = 0x1 << j;
-                if ( !(frames[i]&toTest) )
+                if ( !(frames[i] & toTest) )
                 {
                     return i * 4 * 8 + j;
                 }
@@ -94,7 +94,8 @@ alloc_frame (page_t *page, int is_kernel, int is_writeable)
           {
             // PANIC! no free frames!!
           }
-        set_frame(idx * 0x1000);
+
+        set_frame (idx * 0x1000);
         
         page->present = 1;
         page->rw      = (is_writeable) ? 1 : 0;
@@ -177,8 +178,8 @@ initialise_paging ()
     /* Initialise the kernel heap. */
     kheap = create_heap (KHEAP_START, KHEAP_START + KHEAP_INITIAL_SIZE, 0xCFFFF000, 0, 0);
 
-    current_directory = clone_directory(kernel_directory);
-    switch_page_directory(current_directory);
+    current_directory = clone_directory (kernel_directory);
+    switch_page_directory (current_directory);
 }
 
 void
@@ -204,11 +205,11 @@ get_page (u32int address, int make, page_directory_t *dir)
       {
         return &dir->tables[table_idx]->pages[address % 1024];
       }
-    else if(make)
+    else if (make)
       {
         u32int tmp;
-        dir->tables[table_idx] = (page_table_t*)kmalloc_ap(sizeof(page_table_t), &tmp);
-        memset(dir->tables[table_idx], 0, 0x1000);
+        dir->tables[table_idx] = (page_table_t *) kmalloc_ap (sizeof (page_table_t), &tmp);
+        memset (dir->tables[table_idx], 0, 0x1000);
         dir->tablesPhysical[table_idx] = tmp | 0x7; // PRESENT, RW, US.
         return &dir->tables[table_idx]->pages[address%1024];
       }
@@ -236,16 +237,16 @@ page_fault (registers_t regs)
     int id        = regs.err_code & 0x10;          // Caused by an instruction fetch?
 
     // Output an error message.
-    monitor_write("Page fault! ( ");
-    if (present)  monitor_write("present ");
-    if (rw)       monitor_write("read-only ");
-    if (us)       monitor_write("user-mode ");
-    if (reserved) monitor_write("reserved ");
-    monitor_write(") at 0x");
-    monitor_write_hex(faulting_address);
-    monitor_write(" - EIP: ");
-    monitor_write_hex(regs.eip);
-    monitor_write("\n");
+    monitor_write ("Page fault! ( ");
+    if (present)  monitor_write ("present ");
+    if (rw)       monitor_write ("read-only ");
+    if (us)       monitor_write ("user-mode ");
+    if (reserved) monitor_write ("reserved ");
+    monitor_write (") at 0x");
+    monitor_write_hex (faulting_address);
+    monitor_write (" - EIP: ");
+    monitor_write_hex (regs.eip);
+    monitor_write ("\n");
     PANIC("Page fault");
 }
 
@@ -255,7 +256,7 @@ clone_table (page_table_t *src, u32int *physAddr)
     /* Make a new page table, which is page aligned. */
     page_table_t *table = (page_table_t *) kmalloc_ap (sizeof (page_table_t), physAddr);
     /* Ensure that the new table is blank. */
-    memset (table, 0, sizeof(page_directory_t));
+    memset (table, 0, sizeof (page_directory_t));
 
     /* For every entry in the table... */
     int i;
@@ -275,7 +276,7 @@ clone_table (page_table_t *src, u32int *physAddr)
             if (src->pages[i].dirty)    table->pages[i].dirty = 1;
             
             /* Physically copy the data across. This function is in process.s. */
-            copy_page_physical (src->pages[i].frame * 0x1000, table->pages[i].frame*0x1000);
+            copy_page_physical (src->pages[i].frame * 0x1000, table->pages[i].frame * 0x1000);
           }
       }
     

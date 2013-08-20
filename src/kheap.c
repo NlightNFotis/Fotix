@@ -25,7 +25,7 @@ kmalloc_int (u32int sz, int align, u32int *phys)
         if (phys != 0)
           {
             page_t *page = get_page((u32int) addr, 0, kernel_directory);
-            *phys 		 = page->frame * 0x1000 + (u32int) addr & 0xFFF;
+            *phys 		 = page->frame * 0x1000 + ((u32int) addr & 0xFFF);
           }
         return (u32int)addr;
       }

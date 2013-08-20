@@ -34,39 +34,54 @@ main (struct multiboot *mboot_ptr, /* Initial multiboot information, passed by t
         u32int initial_stack) /* The initial stack pointer */
 {
     initial_esp = initial_stack;
+    
+    monitor_clear ();
+
+    monitor_write ("Fotix v0.1\n");
+    monitor_write ("Copyright (c) 2013 Fotis Koutoulakis\n");
+    monitor_write ("http://www.fotiskoutoulakis.com\n");
+    monitor_put ('\n');
 
     /* Initialise all the ISRs and segmentation */
     init_descriptor_tables ();
-    /* Initialise the screen (by clearing it) */
-    monitor_clear ();
+    monitor_write ("Descriptor tables initialised!\n");
 
     /* Initialise the PIT to 100Hz */
     asm volatile ("sti");
     init_timer (50);
+    monitor_write ("Timer initialised!\n");
 
     /* Print a hello world like string to the screen. */
-    monitor_write ("Hello, from Fotix.\n");
-    monitor_write ("Copyright (c) 2013 Fotis Koutoulakis\n");
-    monitor_write ("http://www.fotiskoutoulakis.com\n");
+//    monitor_write ("Hello, from Fotix.\n");
+//    monitor_write ("Copyright (c) 2013 Fotis Koutoulakis\n");
+//    monitor_write ("http://www.fotiskoutoulakis.com\n");
 
     /* Find the location of our initial ramdisk. */
     ASSERT(mboot_ptr->mods_count > 0);
     u32int initrd_location = *((u32int *) mboot_ptr->mods_addr);
     u32int initrd_end      = *(u32int *) (mboot_ptr->mods_addr + 4);
 
+    monitor_write ("Initial ramdisk found!\n");
+
     /* Don't trample our module with placement accesses, please! */
     placement_address = initrd_end;
 
-    /* Initialise paging. */
+    /*  Initialise paging. */
     initialise_paging ();
+
+    monitor_write ("Paging initialised!\n"); 
 
     /* Initialise multitasking */
     initialise_tasking ();
 
+    monitor_write ("Multitasking system initialised!\n");
+
     /* Initialise the initial ramdisk, and set it as the filesystem root. */
     fs_root = initialise_initrd (initrd_location);
+
+    monitor_write ("Ramdisk initialised!\n");
     
-    /* Create a new process in a new address space which is a clone of this */
+    /* Create a new process in a new address space which is a clone of this */ 
     int ret = fork ();
 
     monitor_write ("fork() returned ");
@@ -76,8 +91,10 @@ main (struct multiboot *mboot_ptr, /* Initial multiboot information, passed by t
     monitor_write("\n=====================================================\n");
 
     /* The next section of code is not reentrant, so make sure we are not interrupted
-     * during it. */
+     * during it. 
+     */
     asm volatile ("cli");
+    monitor_write ("Now testing the ramdisk!\n");
 
     /* Test the ramdisk */
     int counter;
@@ -108,6 +125,5 @@ main (struct multiboot *mboot_ptr, /* Initial multiboot information, passed by t
     monitor_write ("\n");
 
     asm volatile ("sti");
-
     return 0;
 }

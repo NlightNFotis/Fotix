@@ -10,6 +10,11 @@
 
 #include "common.h"
 
+struct fs_node;
+
+/* These typedefs define the type of callbacks -
+ * called when read/write/open/close
+ */
 typedef u32int (*read_type_t)(struct fs_node *, u32int, u32int, u8int *);
 typedef u32int (*write_type_t)(struct fs_node *, u32int, u32int, u8int *);
 typedef void   (*open_type_t)(struct fs_node *);
@@ -61,7 +66,7 @@ u32int read_fs  (fs_node_t *node, u32int offset, u32int size, u8int *buffer);
 u32int write_fs (fs_node_t *node, u32int offset, u32int size, u8int *buffer);
 void   open_fs  (fs_node_t *node, u8int read, u8int write);
 void   close_fs (fs_node_t *node);
-struct dirent *readdir (fs_node_t *node, u32int index);
+struct dirent *readdir_fs (fs_node_t *node, u32int index);
 fs_node_t *finddir_fs (fs_node_t *node, char *name);
 
 #endif
