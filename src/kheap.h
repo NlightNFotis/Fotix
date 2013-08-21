@@ -67,7 +67,7 @@ u32int kmalloc_ap (u32int sz, u32int *phys);
 u32int kmalloc (u32int sz);
 
 /* General deallocation function. */
-void kfree(void *p);
+void kfree (void *p);
 
 /* Create a new heap. */
 heap_t *create_heap (u32int start, u32int end, u32int max, u8int supervisor, u8int readonly);

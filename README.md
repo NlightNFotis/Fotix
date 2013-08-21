@@ -65,6 +65,15 @@ Bourne Shell                     1              3              4             11
 SUM:                            33            503            672           2162
 -------------------------------------------------------------------------------
 
+TODO
+======
+
+ - Implement IPC
+ - Implement threading
+ - Improve memory management
+ - Implement a console
+ - Improve the scheduler
+
 
 LICENSE
 ========

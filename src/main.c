@@ -14,6 +14,7 @@
 #include "initrd.h"
 #include "task.h"
 #include "syscall.h"
+#include "keyboard.h"
 
 extern u32int placement_address;
 u32int initial_esp;
@@ -72,14 +73,20 @@ kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, pas
     /* Initialise the initial ramdisk, and set it as the filesystem root. */
     fs_root = initialise_initrd (initrd_location);
     monitor_write ("Ramdisk initialised!\n");
-    asm volatile("hlt");
 
     initialise_syscalls();
     monitor_write ("Syscall interface initialised!\n");
 
-    switch_to_user_mode();
+    for (;;)
+       {
+           char c = keyboard_getchar ();
+           if (c)
+               monitor_put (c);
+       }
 
-    syscall_monitor_write("Hello, user world!\n");
+    // switch_to_user_mode();
+
+    // syscall_monitor_write("Hello, user world!\n");
 
     return 0;
 }
