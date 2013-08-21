@@ -45,6 +45,27 @@ I should have a cross compiler built (along with binutils)
  - When a fork()-ed process attemtps to run, we get a page fault, 
    which results on a kernel panic.
 
+## Notes
+
+02:50:34 nlightnfotis@earth ~/osdev/fotix $ cloc .
+      37 text files.
+      37 unique files.
+     353 files ignored.
+
+http://cloc.sourceforge.net v 1.56  T=1.0 s (33.0 files/s, 3337.0 lines/s)
+-------------------------------------------------------------------------------
+Language                     files          blank        comment           code
+-------------------------------------------------------------------------------
+C                               14            325            428           1488
+C/C++ Header                    13            130            190            459
+Assembly                         4             39             48            190
+make                             1              6              2             14
+Bourne Shell                     1              3              4             11
+-------------------------------------------------------------------------------
+SUM:                            33            503            672           2162
+-------------------------------------------------------------------------------
+
+
 LICENSE
 ========
 
