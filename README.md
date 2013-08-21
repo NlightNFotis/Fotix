@@ -1,16 +1,17 @@
-fotix is a unix like clone.
+fotix is a unix like clone.  
 Copyright (c) 2013 Fotis Koutoulakis
 
 Introduction
 ============
 
-fotix is a unix like kernel that I made, mostly for self-education / self amusement.
+fotix is a unix like kernel that I made, mostly for self-education / self-amusement.
 
 Features:
- - Interrupt handling.
- - Multitasking capable
- - Some (primal) memory management
- - A (primal) scheduler
+
+- Interrupt handling.
+- Multitasking capable
+- Some (primal) memory management
+- A (primal) scheduler
 
 Instructions
 ============
@@ -41,7 +42,8 @@ I should have a cross compiler built (along with binutils)
 
 ## Known bugs
 
- - When a fork()-ed process attemtps to run, we get a page fault, and a kernel panic
+ - When a fork()-ed process attemtps to run, we get a page fault, 
+   which results on a kernel panic.
 
 LICENSE
 ========
