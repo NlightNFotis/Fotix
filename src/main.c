@@ -31,8 +31,8 @@ u32int initial_esp;
  *  [Further booting]
  */
 int
-main (struct multiboot *mboot_ptr, /* Initial multiboot information, passed by the bootloader */
-        u32int initial_stack) /* The initial stack pointer */
+kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, passed by the bootloader */
+              u32int initial_stack) /* The initial stack pointer */
 {
     initial_esp = initial_stack;
     
