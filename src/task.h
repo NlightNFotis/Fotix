@@ -10,15 +10,18 @@
 #include "common.h"
 #include "paging.h"
 
+#define KERNEL_STACK_SIZE 2048  /* Use a 2kb kernel stack */
+
 /* This structure defines a 'task' - a process. */
 typedef struct task
 {
-    int id;             /* Process ID. */
-    u32int esp,         /* Extended stack pointer. */ 
-           ebp,         /* Extended base pointer. */
-           eip;         /* Extended instruction pointer. */
+    int id;                             /* Process ID. */
+    u32int esp,                         /* Extended stack pointer. */ 
+           ebp,                         /* Extended base pointer. */
+           eip;                         /* Extended instruction pointer. */
     page_directory_t *page_directory;   /* Page directory for this task. */
-    struct task *next;  /* The next task in a linked list. */
+    u32int kernel_stack;                /* Kernel stack location. */
+    struct task *next;                  /* The next task in a linked list. */
 } task_t;
 
 /* Initialises the tasking system. */

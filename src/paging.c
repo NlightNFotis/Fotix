@@ -158,7 +158,7 @@ initialise_paging ()
      * initialised properly.
      */
     i = 0;
-    while (i < placement_address + 0x1000)
+    while (i < 0x400000 ) /* placement_address + 0x1000 */
       {
         // Kernel code is readable but not writeable from userspace.
         alloc_frame (get_page (i, 1, kernel_directory), 0, 0);
@@ -222,7 +222,7 @@ get_page (u32int address, int make, page_directory_t *dir)
 
 /* The page fault handler */
 void
-page_fault (registers_t regs)
+page_fault (registers_t *regs)
 {
     // A page fault has occurred.
     // The faulting address is stored in the CR2 register.
@@ -230,11 +230,11 @@ page_fault (registers_t regs)
     asm volatile ("mov %%cr2, %0" : "=r" (faulting_address));
     
     // The error code gives us details of what happened.
-    int present   = !(regs.err_code & 0x1); // Page not present
-    int rw        = regs.err_code & 0x2;           // Write operation?
-    int us        = regs.err_code & 0x4;           // Processor was in user-mode?
-    int reserved  = regs.err_code & 0x8;     // Overwritten CPU-reserved bits of page entry?
-    int id        = regs.err_code & 0x10;          // Caused by an instruction fetch?
+    int present   = !(regs->err_code & 0x1); // Page not present
+    int rw        = regs->err_code & 0x2;           // Write operation?
+    int us        = regs->err_code & 0x4;           // Processor was in user-mode?
+    int reserved  = regs->err_code & 0x8;     // Overwritten CPU-reserved bits of page entry?
+    int id        = regs->err_code & 0x10;          // Caused by an instruction fetch?
 
     // Output an error message.
     monitor_write ("Page fault! ( ");
@@ -245,7 +245,7 @@ page_fault (registers_t regs)
     monitor_write (") at 0x");
     monitor_write_hex (faulting_address);
     monitor_write (" - EIP: ");
-    monitor_write_hex (regs.eip);
+    monitor_write_hex (regs->eip);
     monitor_write ("\n");
     PANIC("Page fault");
 }
@@ -264,20 +264,21 @@ clone_table (page_table_t *src, u32int *physAddr)
       {
         /* If the source entry has a frame associated with it... */
         if (src->pages[i].frame)
-          {
-            /* Get a new frame. */
-            alloc_frame (&table->pages[i], 0, 0);
+          continue;
+        
+        /* Get a new frame. */
+        alloc_frame (&table->pages[i], 0, 0);
+        
+        /* Clone the flags from source to destination. */
+        if (src->pages[i].present)  table->pages[i].present = 1;
+        if (src->pages[i].rw)       table->pages[i].rw = 1;
+        if (src->pages[i].user)     table->pages[i].user = 1;
+        if (src->pages[i].accessed) table->pages[i].accessed = 1;
+        if (src->pages[i].dirty)    table->pages[i].dirty = 1;
             
-            /* Clone the flags from source to destination. */
-            if (src->pages[i].present)  table->pages[i].present = 1;
-            if (src->pages[i].rw)       table->pages[i].rw = 1;
-            if (src->pages[i].user)     table->pages[i].user = 1;
-            if (src->pages[i].accessed) table->pages[i].accessed = 1;
-            if (src->pages[i].dirty)    table->pages[i].dirty = 1;
-            
-            /* Physically copy the data across. This function is in process.s. */
-            copy_page_physical (src->pages[i].frame * 0x1000, table->pages[i].frame * 0x1000);
-          }
+        /* Physically copy the data across. This function is in process.s. */
+        copy_page_physical (src->pages[i].frame * 0x1000, table->pages[i].frame * 0x1000);
+          
       }
     
     return table;

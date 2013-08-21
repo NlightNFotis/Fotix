@@ -1,7 +1,7 @@
 /* This file is part of fotix
  * Copyright (c) 2013 Fotis Koutoulakis
  *
- * task.c -- Implements the functionality need to multitask
+ * task.c -- Implements the functionality needed to multitask
  */
 
 #include "task.h"
@@ -153,6 +153,12 @@ switch_task ()
     esp = current_task->esp;
     ebp = current_task->ebp;
 
+    /* Make sure the memory manager knows we've changed page directory. */
+    current_directory = current_task->page_directory;
+
+    /* Change our kernel stack over */
+    set_kernel_stack (current_task->kernel_stack + KERNEL_STACK_SIZE);
+
     /* Here we:
      * - Stop interrupts so we don't get interrupted.
      * - Temporarily put the new EIP location in ECX.
@@ -239,3 +245,45 @@ getpid ()
 {
     return current_task->id;
 }
+
+void
+switch_to_user_mode ()
+{
+    /* Set up our kernel stack. */
+    set_kernel_stack (current_task->kernel_stack + KERNEL_STACK_SIZE);
+
+    /* Set up a stack structure for switching to user mode. 
+     * Our code does the following:
+     *  - First we disable interrupts, because we are working
+     *    on a sensitive piece of code.
+     *  - Secondly we set ds, es, fs, and gs segment selectors
+     *    to our user mode data selector - 0x23.
+     *  - Next we save the stack pointer in EAX for later reference.
+     *  - Then we push our stack segment selector value, then push 
+     *    the value that we want to the stack pointer to have after
+     *    the IRET.
+     *  - The pushf instruction pushes the current value of EFLAGS,
+     *    we then push CS selector value (0x1b).
+     *  - Since we disable interrupts, there is no way to reenable them
+     *    if we get into user mode. So we set the IF flag in EFLAGS
+     *    so that interrupts get attomically reenabled as IRET is executing.
+     */    
+    asm volatile ("          \
+            cli;             \
+            mov $0x23, %ax;  \
+            mov %ax, %ds;    \
+            mov %ax, %fs;    \
+            mov %ax, %gs;    \
+                             \
+            mov %esp, %eax;  \
+            pushl $0x23;     \
+            pushl %eax;      \
+            pushf;           \
+                             \
+            pushl $0x1B;     \
+            push  $1f;       \
+            iret;            \
+         1:                  \
+         ");
+}
+

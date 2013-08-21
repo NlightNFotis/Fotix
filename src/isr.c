@@ -21,17 +21,23 @@ register_interrupt_handler (u8int num, isr_t handler)
 void 
 isr_handler (registers_t regs)
 {
-    if (interrupt_handlers[regs.int_no] != 0)
-    {
-        isr_t handler = interrupt_handlers[regs.int_no];
-        handler (regs);
-    }
+	/* This line is important. When the processor extends the 8-bit interrupt number
+     * to a 32bit value, it sign-extends, not zero extends. So if the most significant
+     * bit (0x80 is set, regs.int_no will be very large (about 0xffffff80).
+     */
+    u8int int_no = regs.int_no & 0xFF;
+    if (interrupt_handlers[int_no] != 0)
+      {
+        isr_t handler = interrupt_handlers[int_no];
+        handler (&regs);
+      }
     else
-    {
+      {
         monitor_write ("unhandled interrupt: ");
-        monitor_write_dec (regs.int_no);
+        monitor_write_hex (int_no);
         monitor_put ('\n');
-    }
+		for (;;);
+      }
 }
 
 /* This get's called from our ASM interrupt handler stub. */
@@ -55,6 +61,6 @@ irq_handler (registers_t regs)
     if (interrupt_handlers[regs.int_no] != 0)
         {
             isr_t handler = interrupt_handlers[regs.int_no];
-            handler (regs);
+            handler (&regs);
         }
 }

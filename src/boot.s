@@ -1,6 +1,7 @@
 ;
-; boot.s -- fotix start location. Also defines multiboot header.
-;
+; boot.s -- the kernel bootstrapper.
+; This file is part of fotix
+; Copyright (c) 2013 Fotis Koutoulakis
 ;
 
 MBOOT_PAGE_ALIGN    equ 1<<0    ; Load kernel and modules on a page boundary

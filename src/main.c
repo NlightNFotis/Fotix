@@ -13,6 +13,7 @@
 #include "fs.h"
 #include "initrd.h"
 #include "task.h"
+#include "syscall.h"
 
 extern u32int placement_address;
 u32int initial_esp;
@@ -51,16 +52,10 @@ main (struct multiboot *mboot_ptr, /* Initial multiboot information, passed by t
     init_timer (50);
     monitor_write ("Timer initialised!\n");
 
-    /* Print a hello world like string to the screen. */
-//    monitor_write ("Hello, from Fotix.\n");
-//    monitor_write ("Copyright (c) 2013 Fotis Koutoulakis\n");
-//    monitor_write ("http://www.fotiskoutoulakis.com\n");
-
     /* Find the location of our initial ramdisk. */
     ASSERT(mboot_ptr->mods_count > 0);
     u32int initrd_location = *((u32int *) mboot_ptr->mods_addr);
     u32int initrd_end      = *(u32int *) (mboot_ptr->mods_addr + 4);
-
     monitor_write ("Initial ramdisk found!\n");
 
     /* Don't trample our module with placement accesses, please! */
@@ -68,62 +63,23 @@ main (struct multiboot *mboot_ptr, /* Initial multiboot information, passed by t
 
     /*  Initialise paging. */
     initialise_paging ();
-
     monitor_write ("Paging initialised!\n"); 
 
     /* Initialise multitasking */
     initialise_tasking ();
-
     monitor_write ("Multitasking system initialised!\n");
 
     /* Initialise the initial ramdisk, and set it as the filesystem root. */
     fs_root = initialise_initrd (initrd_location);
-
     monitor_write ("Ramdisk initialised!\n");
-    
-    /* Create a new process in a new address space which is a clone of this */ 
-    int ret = fork ();
+    asm volatile("hlt");
 
-    monitor_write ("fork() returned ");
-    monitor_write_hex (ret);
-    monitor_write (", and getpid() returned ");
-    monitor_write_hex (getpid ());
-    monitor_write("\n=====================================================\n");
+    initialise_syscalls();
+    monitor_write ("Syscall interface initialised!\n");
 
-    /* The next section of code is not reentrant, so make sure we are not interrupted
-     * during it. 
-     */
-    asm volatile ("cli");
-    monitor_write ("Now testing the ramdisk!\n");
+    switch_to_user_mode();
 
-    /* Test the ramdisk */
-    int counter;
-    struct dirent *node = 0;
-    while ((node = readdir_fs (fs_root, counter)) != 0)
-      {
-        monitor_write ("Found file ");
-        monitor_write (node->name);
-        fs_node_t *fsnode = finddir_fs (fs_root, node->name);
+    syscall_monitor_write("Hello, user world!\n");
 
-        if ((fsnode->flags & 0x7) == FS_DIRECTORY)
-            monitor_write ("\n\t(directory)\n");
-        else
-          {
-             monitor_write ("\n\t contents: \"");
-             char buf[256];
-             u32int sz = read_fs (fsnode, 0, 256, buf);
-             int second_counter;
-             for (second_counter = 0; second_counter < sz; second_counter++)
-                monitor_put (buf[second_counter]);
-
-             monitor_write("\"\n");
-           }
-
-        counter++;
-      }
-
-    monitor_write ("\n");
-
-    asm volatile ("sti");
     return 0;
 }
