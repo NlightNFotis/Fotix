@@ -1,0 +1,17 @@
+# COMPILED SOURCE #
+###################
+
+*.o
+*.so
+
+# DISTRIBUTION ISOS #
+#####################
+
+*.iso
+
+# LOGS AND MISCELANIA #
+#######################
+
+*.log
+cscope.out
+*.img
