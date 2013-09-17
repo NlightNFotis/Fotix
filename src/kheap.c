@@ -170,13 +170,13 @@ find_smallest_hole (u32int size, u8int page_align, heap_t *heap)
 }
 
 static s8int 
-header_t_less_than (void*a, void *b)
+header_t_less_than (void *a, void *b)
 {
     return (((header_t *) a)->size < ((header_t *) b)->size) ? 1 : 0;
 }
 
 heap_t *
-create_heap(u32int start, u32int end_addr, u32int max, u8int supervisor, u8int readonly)
+create_heap (u32int start, u32int end_addr, u32int max, u8int supervisor, u8int readonly)
 {
     heap_t *heap = (heap_t *) kmalloc (sizeof (heap_t));
 
@@ -254,7 +254,7 @@ alloc (u32int size, u8int page_align, heap_t *heap)
 
         /* If we didn't find ANY headers, we need to add one. */
         if (idx == -1)
-        {
+          {
             header_t *header = (header_t *) old_end_address;
             header->magic    = HEAP_MAGIC;
             header->size     = new_length - old_length;
@@ -263,9 +263,9 @@ alloc (u32int size, u8int page_align, heap_t *heap)
             footer->magic    = HEAP_MAGIC;
             footer->header   = header;
             insert_ordered_array ((void *)header, &heap->index);
-        }
+          }
         else
-        {
+          {
             /* The last header needs adjusting. */
             header_t *header = lookup_ordered_array (idx, &heap->index);
             header->size    += new_length - old_length;
@@ -274,7 +274,7 @@ alloc (u32int size, u8int page_align, heap_t *heap)
             footer_t *footer = (footer_t *) ((u32int) header + header->size - sizeof (footer_t));
             footer->header   = header;
             footer->magic    = HEAP_MAGIC;
-        }
+          }
         
         /* We now have enough space. Recurse, and call the function again. */
         return alloc (size, page_align, heap);

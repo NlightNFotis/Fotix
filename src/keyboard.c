@@ -150,23 +150,25 @@ switch_layout (keymap_t *layout)
 void
 keyboard_handler (registers_t *regs)
 {
-    u8int scancode = inb(0x60);
+    u8int scancode = inb (0x60);
 
     /* Has the key been released? Check bit no. 7 */
-    if (scancode & RELEASED_MASK) {
+    if (scancode & RELEASED_MASK) 
+      {
         /* We only need to check the first five ones,
          * because they're the only ones doin anything on release.
          */
         u32int i;
-        for (i = 0; i < 5; i++) {
+        for (i = 0; i < 5; i++) 
+          {
             if (current_layout->control_map[i] == (scancode & ~RELEASED_MASK))
               {
                   /* Releasing the key always disables its functions */
-                  current_layout->controls &= ~(1 << 1);
+                  current_layout->controls &= ~(1 << i);
                   return;
               }
-        }
-    }
+          }
+      }
     else
       {
           /* check if pressed key was a control key and 

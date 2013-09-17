@@ -31,7 +31,7 @@ u32int initial_esp;
  *  - Initialise the tasking system (scheduler)
  *  [Further booting]
  */
-int
+u32int
 kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, passed by the bootloader */
               u32int initial_stack) /* The initial stack pointer */
 {
@@ -74,9 +74,10 @@ kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, pas
     fs_root = initialise_initrd (initrd_location);
     monitor_write ("Ramdisk initialised!\n");
 
-    initialise_syscalls();
-    monitor_write ("Syscall interface initialised!\n");
+    // initialise_syscalls();
+    // monitor_write ("Syscall interface initialised!\n");
 
+    init_keyboard_driver ();
     for (;;)
        {
            char c = keyboard_getchar ();
@@ -88,5 +89,5 @@ kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, pas
 
     // syscall_monitor_write("Hello, user world!\n");
 
-    return 0;
+    return 0xdeadbeef;
 }
