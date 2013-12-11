@@ -17,29 +17,37 @@ mkdir $DIR
 pushd $DIR
 
 echo "WGET: Preparing to pull gcc sources"
+sleep 2
 wget ftp://ftp.gnu.org/gnu/gcc/gcc-$GCC_VERSION/gcc-$GCC_VERSION.tar.gz
 tar -xf gcc-$GCC_VERSION.tar.gz
 mv gcc-$GCC_VERSION/ gcc/
 
+echo
 echo "WGET: Preparing to pull gmp (needed to build gcc)"
+sleep 2
 wget http://ftp.gnu.org/gnu/gmp/gmp-5.1.3.tar.xz
 tar -xf gmp-5.1.3.tar.xz
 mv gmp-5.1.3/ gmp/
 mv gmp/ gcc/
 
+echo
 echo "WGET: Preparing to pull mpfr (needed to build gcc)"
 wget http://www.mpfr.org/mpfr-3.1.2/mpfr-3.1.2.tar.xz
 tar -xf mpfr-3.1.2.tar.xz
 mv mpfr-3.1.2/ mpfr/
 mv mpfr/ gcc/
 
+echo
 echo "WGET: Preparing to pull mpc (needed to build gcc)"
+sleep 2
 wget http://www.multiprecision.org/mpc/download/mpc-1.0.1.tar.gz
 tar -xf mpc-1.0.1.tar.gz
 mv mpc-1.0.1/ mpc/
 mv mpc/ gcc/
 
+echo
 echo "WGET: Preparing to pull binutils sources"
+sleep 2
 wget http://ftp.gnu.org/gnu/binutils/binutils-$BINUTILS_VERSION.tar.gz
 tar -xf binutils-$BINUTILS_VERSION.tar.gz
 mv binutils-$BINUTILS_VERSION/ binutils/
@@ -51,20 +59,21 @@ mkdir binutils-build
 pushd binutils-build
 ../binutils/configure --target=$TARGET --prefix="$PREFIX" --disable-nls
 make -j4
-#make install #uncomment to use
+make install
 popd
 
 echo
 echo "Preparing to build GCC"
 echo
+sleep 5
 mkdir gcc-build
 pushd gcc-build
 ../gcc/configure --target=$TARGET --prefix="$PREFIX" --disable-nls \
  --enable-languages=c,c++ --without-headers
 make all-gcc -j4
 make all-target-libgcc -j4
-#make install-gcc
-#make install-target-libgcc
+make install-gcc
+make install-target-libgcc
 popd
 
 popd
