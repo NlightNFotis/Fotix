@@ -7,7 +7,13 @@
 
 #include "common.h"
 
-// Write a byte out to the specified port.
+/* This family of functions (outb, inb, inw etc) have to do 
+ * with low level port input and output. The out* functions
+ * do port output, in* do port input, b-suffix denotes
+ * byte width, and w-suffix denotes word width.
+ */
+
+/* Write a byte out to the specified port. */
 void 
 outb (u16int port, u8int value)
 {
@@ -18,7 +24,7 @@ u8int
 inb (u16int port)
 {
     u8int ret;
-    asm volatile("inb %1, %0" : "=a" (ret) : "dN" (port));
+    asm volatile ("inb %1, %0" : "=a" (ret) : "dN" (port));
     return ret;
 }
 
@@ -36,7 +42,7 @@ memcpy (u8int *dest, const u8int *src, u32int len)
 {
     const u8int *sp = (const u8int *) src;
     u8int *dp = (u8int *) dest;
-    for(; len != 0; len--) *dp++ = *sp++;
+    for ( ; len != 0; len--) *dp++ = *sp++;
 }
 
 /* Write len copies of val into dest. */
@@ -49,7 +55,8 @@ memset (u8int *dest, u8int val, u32int len)
 
 /* Compare two strings. Should return -1 if 
    str1 < str2, 0 if they are equal or 1 otherwise. */
-int strcmp(char *str1, char *str2)
+int 
+strcmp (char *str1, char *str2)
 {
       int i      = 0,
           failed = 0;
@@ -101,7 +108,9 @@ strcat (char *dest, const char *src)
     return dest;
 }
 
-int strlen(char *src)
+/* Return the length of a string */
+int 
+strlen (char *src)
 {
     int i = 0;
     while (*src++)
@@ -109,10 +118,16 @@ int strlen(char *src)
     return i;
 }
 
+/* XXX: I don't like the two below. Maybe move them to a different
+ * file and create a panic specific mechanism that reacts better, and
+ * has the ability to be given custom messages to show to the screen
+ * (too much code duplication below).
+ */
+
+/* We encountered a situation where we have to result to a kernel panic. */
 extern void 
 panic (const char *message, const char *file, u32int line)
 {
-    /* We encountered a massive problem and have to stop. */
     asm volatile ("cli"); /* Disable interrupts. */
 
     monitor_write ("PANIC(");
@@ -122,14 +137,19 @@ panic (const char *message, const char *file, u32int line)
     monitor_write (":");
     monitor_write_dec (line);
     monitor_write ("\n");
-    /* Halt by going into an infinite loop. */
-    for(;;); /* XXX: maybe assembly instruction "hlt" might be better. */
+
+    /* Halting the computer as a reaction to the kernel panic,
+     * seems to be a good idea for the time being. At least
+     * it's better than putting the computer in an infinite loop.
+     */
+    monitor_write ("Computer halting now!\n");
+    asm volatile ("hlt");
 }
 
+/* An assertion failed so we have to result to a kernel panic. */
 extern void 
 panic_assert (const char *file, u32int line, const char *desc)
 {
-    /* An assertion failed, and we have to panic. */
     asm volatile("cli"); /* Disable interrupts. */
 
     monitor_write ("ASSERTION-FAILED(");
@@ -139,6 +159,8 @@ panic_assert (const char *file, u32int line, const char *desc)
     monitor_write (":");
     monitor_write_dec (line);
     monitor_write ("\n");
-    /* Halt by going into an infinite loop. */
-    for(;;);
+
+    /* Again, halting the computer seems like a good solution for now */
+    monitor_write ("Computer halting now!\n");
+    asm volatile ("hlt");
 }
