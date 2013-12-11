@@ -47,6 +47,7 @@ I should have a cross compiler built (along with binutils)
 
 ## Notes
 
+```
 02:50:34 nlightnfotis@earth ~/osdev/fotix $ cloc .
       37 text files.
       37 unique files.
@@ -64,6 +65,7 @@ Bourne Shell                     1              3              4             11
 -------------------------------------------------------------------------------
 SUM:                            33            503            672           2162
 -------------------------------------------------------------------------------
+```
 
 TODO
 ======
