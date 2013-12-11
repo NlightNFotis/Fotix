@@ -1,5 +1,5 @@
 #!/bin/bash
-# Script to update the kernel image and run fotix
+# 1 step build script
 # Copyright (C) 2013 Fotis Koutoulakis
 
 # Begin building fotix

@@ -74,8 +74,8 @@ kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, pas
     fs_root = initialise_initrd (initrd_location);
     monitor_write ("Ramdisk initialised!\n");
 
-    // initialise_syscalls();
-    // monitor_write ("Syscall interface initialised!\n");
+    initialise_syscalls();
+    monitor_write ("Syscall interface initialised!\n");
 
     init_keyboard_driver ();
     for (;;)
@@ -85,9 +85,9 @@ kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, pas
                monitor_put (c);
        }
 
-    // switch_to_user_mode();
+    switch_to_user_mode();
 
-    // syscall_monitor_write("Hello, user world!\n");
+    syscall_monitor_write("Hello, user world!\n");
 
     return 0xdeadbeef;
 }
