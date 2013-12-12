@@ -4,7 +4,7 @@
 SOURCES=src/boot.o src/main.o src/common.o src/monitor.o src/descriptor_tables.o \
 	src/isr.o src/interrupt.o src/dt_asm.o src/timer.o src/kheap.o src/paging.o \
 	src/ordered_array.o src/fs.o src/initrd.o src/task.o src/process.o src/syscall.o \
-	src/keyboard.o
+	src/keyboard.o src/memdetect.o
 
 RAMDISK_INIT=utils/mkinit.c
 CFLAGS=-nostdlib -nostdinc -fno-builtin -fno-stack-protector -m32
@@ -15,10 +15,10 @@ CC=i586-elf-gcc
 all: $(SOURCES) link
 
 clean:
-	rm src/*.o kernel
 	rm -rf temp/
 	rm rd_init
 	rm initrd.img
+	rm src/*.o kernel
 
 link:
 	ld $(LDFLAGS) -o kernel $(SOURCES)

@@ -15,6 +15,7 @@
 #include "task.h"
 #include "syscall.h"
 #include "keyboard.h"
+#include "memdetect.h"
 
 extern u32int placement_address;
 u32int initial_esp;
@@ -43,6 +44,19 @@ kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, pas
     monitor_write ("Copyright (c) 2013 Fotis Koutoulakis\n");
     monitor_write ("http://www.fotiskoutoulakis.com\n");
     monitor_put ('\n');
+
+    monitor_write ("Computer information:\n");
+
+    /* Detect memory */
+    SMAP_entry_t *smap = (SMAP_entry_t *) 0x1000;
+    const int smap_size = 0x2000;
+
+    int entry_count = detectMemory (smap, smap_size / sizeof (SMAP_entry_t));
+
+    if (entry_count == -1)
+        panic ("Unable to detect memory correctly", "main.c", 57);
+
+    /* TODO: show system memory */
 
     /* Initialise all the ISRs and segmentation */
     init_descriptor_tables ();
@@ -85,9 +99,10 @@ kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, pas
                monitor_put (c);
        }
 
-    switch_to_user_mode();
+    switch_to_user_mode ();
 
-    syscall_monitor_write("Hello, user world!\n");
+    monitor_put ("\n");
+    syscall_monitor_write ("Hello, user world!\n");
 
     return 0xdeadbeef;
 }
