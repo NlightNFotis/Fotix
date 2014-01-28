@@ -4,7 +4,7 @@
  * task.c -- Implements the functionality needed to multitask
  */
 
-#include "task.h"
+#include "process.h"
 #include "paging.h"
 
 /* The currently running task. */

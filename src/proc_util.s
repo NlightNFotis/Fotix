@@ -42,6 +42,6 @@ read_eip:
    ; on the stack. Normally we use "ret" to return from a function.
    ; This instruction pops the value from the stack and jumps to it.
    ; Here however, we pop the value ourselves into EAX (EAX is the 
-   ; 'return value' register for the __cdeck calling convention), then jump to it.
+   ; 'return value' register for the __cdecl calling convention), then jump to it.
    pop eax
    jmp eax
