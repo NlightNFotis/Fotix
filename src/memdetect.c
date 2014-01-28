@@ -11,6 +11,11 @@
 /* just for a test */
 asm (".code16gcc\n");
 
+/* XXX: SHIT! This won't work 'cause I am working on protected (32bit mode)
+ * I either have to get back to real mode (16bit) momentarily to make it work, or, look into
+ * virtual 8086 mode. SHIT!
+ */
+
 /* load memory map to buffer - note: regparm(3) avoids stack issues with gcc in realmode */
 int __attribute__((noinline)) __attribute__((regparm(3)))
 detectMemory (SMAP_entry_t *buffer, int maxentries)

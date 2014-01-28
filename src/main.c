@@ -15,7 +15,7 @@
 #include "task.h"
 #include "syscall.h"
 #include "keyboard.h"
-#include "memdetect.h"
+// #include "memdetect.h" Memory detection is buggy as it is.
 
 extern u32int placement_address;
 u32int initial_esp;
@@ -45,16 +45,15 @@ kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, pas
     monitor_write ("http://www.fotiskoutoulakis.com\n");
     monitor_put ('\n');
 
-    monitor_write ("Computer information:\n");
 
-    /* Detect memory */
-    SMAP_entry_t *smap = (SMAP_entry_t *) 0x1000;
-    const int smap_size = 0x2000;
+//    /* Detect memory */
+//    SMAP_entry_t *smap = (SMAP_entry_t *) 0x1000;
+//    const int smap_size = 0x2000;
 
-    int entry_count = detectMemory (smap, smap_size / sizeof (SMAP_entry_t));
+//    int entry_count = detectMemory (smap, smap_size / sizeof (SMAP_entry_t));
 
-    if (entry_count == -1)
-        panic ("Unable to detect memory correctly", "main.c", 57);
+//    if (entry_count == -1)
+//        panic ("Unable to detect memory correctly", "main.c", 57);
 
     /* TODO: show system memory */
 
