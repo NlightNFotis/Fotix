@@ -21,13 +21,29 @@
 
 #include "common.h"
 
+/* Common elf types */
+typedef u16int Elf32_Half;
+typedef u32int Elf32_Off;
+typedef u32int Elf32_Addr;
+typedef u32int Elf32_Word;
+typedef s32int Elf32_Sword;
+
+
 /* The first 16 bytes of the file, serving to identify it. */
 #define SIZE_ELF_IDENT 16 
 
-/* The "magic number" identifying the file as an ELF object file.
- * It's the 4 first entries in elf_ident
- */
-#define ELF_MAGIC 0x464C457FU   /* "0x7ELF" in little endian */
+/* ELF file magic */
+#define ELFMAG0     0x7 
+#define ELFMAG1     'E' 
+#define ELFMAG2     'L' 
+#define ELFMAG3     'F'
+
+/* The following are used in elf.c for elf file
+ * validation */
+#define ELFDATA2LSB (1) /* Little endian */
+#define ELFCLASS32  (1) /* 32-bit arch */
+#define EM_386      (3) /* x86 machine type */
+#define EV_CURRENT  (1) /* ELF Current Version */
 
 /** ELF file header **/
 typedef struct
@@ -36,50 +52,71 @@ typedef struct
     u8int  elf_ident[SIZE_ELF_IDENT];
 
     /* This member identifies the object file type */
-    u16int elf_type;
+    Elf32_Half elf_type;
 
     /* This specifies the required machine architecture for the file */
-    u16int elf_machine;
+    Elf32_Half elf_machine;
 
     /* This identifies the object file version  (0 - 1, invalid - current) */
-    u32int elf_version;
+    Elf32_Word elf_version;
 
     /* The virtual address to which the system first transfer control */
-    u32int elf_entry;
+    Elf32_Addr elf_entry;
 
     /* The program header table's file offset in bytes */
-    u32int elf_phoff;
+    Elf32_Off elf_phoff;
 
     /* The section header table's file offset in bytes */
-    u32int elf_shoff;
+    Elf32_Off elf_shoff;
 
     /* Processor specific flags associated with the file */
-    u32int elf_flags;
+    Elf32_Word elf_flags;
 
     /* ELF Header's size in bytes */
-    u16int elf_ehsize;
+    Elf32_Half elf_ehsize;
 
     /* This holds the size (in bytes) of one entry in the file's program 
      * header table; all the entries are the same size */
-    u16int elf_phentsize;
+    Elf32_Half elf_phentsize;
 
     /* The total number of entries in the program header table */
-    u16int elf_phnum;
+    Elf32_Half elf_phnum;
 
     /* This holds the size (in bytes) of a section header */
-    u16int elf_shentsize;
+    Elf32_Half elf_shentsize;
 
     /* This holds the total number of entries in the section header
      * table */
-    u16int elf_shnum;
+    Elf32_Half elf_shnum;
 
     /* This holds the section header table index of the entry associated
      * with the section name string table.
      */
-    u16int elf_shstrndx;
-} elfhdr_t;
+    Elf32_Half elf_shstrndx;
+} Elf32_elfhdr;
 
-/** Program Section **/
+enum elf_identification
+{
+    EI_MAG0,       /* 0x7F */
+    EI_MAG1,       /* 'E'  */
+    EI_MAG2,       /* 'L'  */
+    EI_MAG3,       /* 'F'  */
+    EI_CLASS,      /* Architecture (32/64) */
+    EI_DATA,       /* Byte order */
+    EI_VERSION,    /* ELF version */
+    EI_OSABI,      /* OS specific */
+    EI_ABIVERSION  /* OS specific */
+    EI_PAD         /* Padding */
+};
+
+enum elf_file_type
+{
+    ET_NONE,    /* Unknown type */
+    ET_REL,     /* Relocatable file */
+    ET_EXEC     /* Executable file */
+};
+
+/** Program header **/
 typedef struct 
 {
     /* This tells what kind of segment this array element describes */
@@ -108,7 +145,22 @@ typedef struct
 
     /* This gives us the value to which the segments are aligned in memory and in file */
     u32int p_align;
-} proghdr_t;
+} Elf32_proghdr;
+
+/** Section header **/
+typedef struct 
+{
+    Elf32_Word  sh_name;
+    Elf32_Word  sh_type;
+    Elf32_Word  sh_flags;
+    Elf32_Addr  sh_addr;
+    Elf32_Off   sh_offset;
+    Elf32_Word  sh_size;
+    Elf32_Word  sh_link;
+    Elf32_Word  sh_info;
+    Elf32_Word  sh_addralign;
+    Elf32_Word  sh_entsize;
+} Elf32_shdr;
 
 /* The value of the type in proghdr_t that signs it as
  * a loadable segment*/

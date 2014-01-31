@@ -9,7 +9,7 @@
 #include "elf.h"
 
 bool
-validate_elf (elfhdr_t *header)
+elf_check_valid (Elf32_elfhdr *header)
 {
     if (!header) return false;
 
@@ -37,7 +37,7 @@ validate_elf (elfhdr_t *header)
 }
  
 bool
-check_elf_supported (elfhdr_t *header)
+elf_check_supported (Elf32_elfhdr *header)
 {
     if (!validate_elf (header)) {
         ERROR ("Invalid ELF File.\n");
@@ -73,7 +73,7 @@ check_elf_supported (elfhdr_t *header)
 }
 
 static void *
-elf_load_rel (elfhdr_t *header)
+elf_load_rel (Elf32_elfhdr *header)
 {
     u32int result;
     result = elf_load_stage1 (header);
@@ -90,4 +90,24 @@ elf_load_rel (elfhdr_t *header)
 
     /* TODO: parse the program header. */
     return (void *) header->elf_entry;
+}
+
+void *
+elf_load_file (void *file)
+{
+    Elf32_elfhdr *header = (Elf32_elfhdr *) file;
+    if (!elf_check_supported (hdr)) {
+       ERROR ("ELF File cannot be loaded.\n");
+       return;
+    }
+
+    switch (header->elf_type) {
+        case ET_EXEC:
+            /* TODO: implement */
+            return null;
+        case ET_REL:
+            return elf_load_rel (hdr);
+    }
+
+    return NULL;
 }

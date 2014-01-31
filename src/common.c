@@ -164,3 +164,17 @@ panic_assert (const char *file, u32int line, const char *desc)
     monitor_write ("Computer halting now!\n");
     asm volatile ("hlt");
 }
+
+/* TODO: maybe define an importance level below, and
+ * log the level of fault each time? For instance
+ * [!!] ERROR: foo bared
+ * NOTE: foo bared
+ * [!!] FATAL: foo bared
+ * etc.
+ */
+void
+error (const char *message)
+{
+    monitor_write ("[!!] ERROR: ");
+    monitor_write (message);
+}
