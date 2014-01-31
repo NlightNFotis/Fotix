@@ -45,6 +45,8 @@ typedef s32int Elf32_Sword;
 #define EM_386      (3) /* x86 machine type */
 #define EV_CURRENT  (1) /* ELF Current Version */
 
+#define ELF_RELOC_ERR -1
+
 /** ELF file header **/
 typedef struct
 {
@@ -162,6 +164,68 @@ typedef struct
     Elf32_Word  sh_entsize;
 } Elf32_shdr;
 
+#define SHN_UNDEF   (0x00) /* Undefined/ Not present */
+
+enum sht_types
+{
+    SHT_NULL        = 0,    /* Null section */
+    SHT_PROGBITS    = 1,    /* Program information */
+    SHT_SYMTAB      = 2,    /* Symbol table */
+    SHT_STRTAB      = 3,    /* String table */
+    SHT_RELA        = 4,    /* Relocation (w/ addend) */
+    SHT_NOBITS      = 8,    /* Not present in the file */
+    SHT_REL         = 9     /* Relocation (no addend) */
+};
+
+enum sht_attributes
+{
+    SHF_WRITE   = 0x01, /* Writeable section */
+    SHF_ALLOC   = 0x02  /* Exists in memory */
+};
+
+typedef struct
+{
+    Elf32_Word  st_name;
+    Elf32_Addr  st_value;
+    Elf32_Word  st_size;
+    u8int       st_info
+    u8int       st_other;
+    Elf32_Half  st_shndx;
+} Elf32_sym;
+
+#define ELF32_ST_BIND(INFO) ((INFO >> 4))
+#define ELF32_ST_TYPE(INFO) ((INFO) & 0x0F)
+
+enum StT_Bindings
+{
+    STB_LOCAL,  /* Local Scope */
+    STB_GLOBAL, /* Global Scope */
+    STB_WEAK    /* Weak (ie. __attribute__ ((weak))) */
+};
+
+enum StT_Types
+{
+    STT_NOTYPE,  /* No Type */
+    STT_OBJECT,  /* Variables, arrays, etc. */
+    STT_FUNC     /* Methods or functions */
+};
+
+/* Relocation sections */
+typedef struct {
+    Elf32_Addr  r_offset;
+    Elf32_Word  r_info;
+    Elf32_Sword r_addend;
+} Elf32_Rel;
+
+#define ELF32_R_SYM(INFO)  ((INFO) >> 8)
+#define ELF32_R_TYPE(INFO) ((u8int) (INFO))
+
+enum RtT_Types {
+    R_386_NONE, /* No relocation */
+    R_386_32,   /* Symbol + Offset */
+    R_386_PC32  /* Symbol + Offset - Section Offset */
+};
+
 /* The value of the type in proghdr_t that signs it as
  * a loadable segment*/
 #define PROG_LOAD 1
@@ -170,5 +234,8 @@ typedef struct
 #define PROG_FLAG_EXEC  1
 #define PROG_FLAG_WRITE 2
 #define PROG_FLAG_READ  4
+
+#define DO_386_32(S, A)      ((S) + (A))
+#define DO_386_PC32(S, A, P) ((S) + (A) - (P))
 
 #endif
