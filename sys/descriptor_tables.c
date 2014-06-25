@@ -5,9 +5,9 @@
  * default ISR and IRQ handler.
  */
 
-#include "common.h"
-#include "descriptor_tables.h"
-#include "isr.h"
+#include "include/common.h"
+#include "include/descriptor_tables.h"
+#include "include/isr.h"
 
 /* Let's us access our ASM functions from our C code. */
 extern void gdt_flush (u32int);

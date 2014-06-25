@@ -5,10 +5,9 @@
  * a system call system.
  */
 
-#include "syscall.h"
-#include "isr.h"
-
-#include "monitor.h"
+#include "include/syscall.h"
+#include "include/isr.h"
+#include "include/monitor.h"
 
 static void syscall_handler (registers_t *regs);
 

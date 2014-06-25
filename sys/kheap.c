@@ -5,8 +5,8 @@
  * to allocate memory in the kernel.
  */
 
-#include "kheap.h"
-#include "paging.h"
+#include "include/kheap.h"
+#include "include/paging.h"
 
 /* end is defined in the linker script */
 extern u32int end;

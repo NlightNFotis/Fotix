@@ -5,8 +5,8 @@
  * with virtual memory management.
  */
 
-#include "paging.h"
-#include "kheap.h"
+#include "include/paging.h"
+#include "include/kheap.h"
 
 /* The kernel's page directory */
 page_directory_t *kernel_directory = 0;
