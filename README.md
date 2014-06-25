@@ -1,5 +1,5 @@
 fotix is a unix like clone.  
-Copyright (c) 2013 Fotis Koutoulakis
+Copyright (c) 2013, 2014 Fotis Koutoulakis
 
 Introduction
 ============
@@ -29,10 +29,10 @@ use QEMU, and the one-step-build script is automated to use QEMU.
 ## Building instructions
 
 If you do have all that, just run `make` at the top of the project's root directory
-and then run the `update_and_run.sh` script (as root). This will create an ISO,
+and then run the `build.sh` script (as root). This will create an ISO,
 and run it with QEMU.
 
-If you don't want to use QEMU, simply modify `update_and_run.sh` to not delete the
+If you don't want to use QEMU, simply modify `build.sh` to not delete the
 iso image, so that you can use it with another hypervisor, or just replace QEMU
 with your favourite hypervisor.
 
@@ -73,7 +73,7 @@ TODO
  - Implement IPC
  - Implement threading
  - Improve memory management
- - Implement a console
+ - Implement a shell
  - Improve the scheduler
 
 
