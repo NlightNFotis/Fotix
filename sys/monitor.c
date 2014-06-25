@@ -5,8 +5,8 @@
  * used to control the screen.
  */
 
-#include "monitor.h"
-#include "common.h"
+#include "include/monitor.h"
+#include "include/common.h"
 
 /* The VGA framebuffer starts at 0xB8000 */
 u16int *video_memory = (u16int *) 0xB8000;

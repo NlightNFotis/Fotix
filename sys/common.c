@@ -5,7 +5,7 @@
  * functions.
  */
 
-#include "common.h"
+#include "include/common.h"
 
 /* This family of functions (outb, inb, inw etc) have to do 
  * with low level port input and output. The out* functions

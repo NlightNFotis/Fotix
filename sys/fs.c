@@ -5,7 +5,7 @@
  * for the virtual file system.
  */
 
-#include "fs.h"
+#include "include/fs.h"
 
 /* The root of the filesystem. */
 fs_node_t *fs_root = 0;

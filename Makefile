@@ -1,13 +1,13 @@
 # Makefile for fotix
 # Copyright (c) 2013 Fotis Koutoulakis
 
-SOURCES=src/boot.o src/main.o src/common.o src/monitor.o src/descriptor_tables.o \
-	src/isr.o src/interrupt.o src/dt_asm.o src/timer.o src/kheap.o src/paging.o \
-	src/ordered_array.o src/fs.o src/initrd.o  src/process.o src/syscall.o \
-	src/keyboard.o src/memdetect.o src/proc_util.o
+SOURCES=sys/boot.o sys/main.o sys/common.o sys/monitor.o sys/descriptor_tables.o \
+	sys/isr.o sys/interrupt.o sys/dt_asm.o sys/timer.o sys/kheap.o sys/paging.o \
+	sys/ordered_array.o sys/fs.o sys/initrd.o sys/process.o sys/syscall.o \
+	sys/keyboard.o sys/memdetect.o sys/proc_util.o
 
 RAMDISK_INIT=utils/mkinit.c
-CFLAGS=-nostdlib -nostdinc -fno-builtin -fno-stack-protector -m32
+CFLAGS=-nostdlib -nostdinc -fno-builtin -fno-stack-protector -m32 -I./
 LDFLAGS=-melf_i386 -Tlink.ld
 ASFLAGS=-felf
 CC=i586-elf-gcc
@@ -15,10 +15,10 @@ CC=i586-elf-gcc
 all: $(SOURCES) link
 
 clean:
+	rm sys/*.o kernel
 	rm -rf temp/
 	rm rd_init
 	rm initrd.img
-	rm src/*.o kernel
 
 link:
 	ld $(LDFLAGS) -o kernel $(SOURCES)

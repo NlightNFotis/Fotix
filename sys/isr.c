@@ -5,9 +5,9 @@
  * interrupt request handlers.
  */
 
-#include "common.h"
-#include "isr.h"
-#include "monitor.h"
+#include "include/common.h"
+#include "include/isr.h"
+#include "include/monitor.h"
 
 isr_t interrupt_handlers[256];
 
