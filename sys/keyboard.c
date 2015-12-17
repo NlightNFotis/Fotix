@@ -18,7 +18,7 @@
  	'\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', /* Enter key */
 
  	/* 29 = Control, 30 - 41: third row */
- 	0, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\\', '\`',
+ 	0, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\\', '`',
 
  	/* fourth row, indices 42 to 53, zeroes are shift keys */
  	0, '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 0,

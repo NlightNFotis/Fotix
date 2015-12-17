@@ -12,7 +12,7 @@
 u32int tick = 0;
 
 static void
-timer_callback (registers_t reg)
+timer_callback (registers_t *reg)
 {
     tick++;
     switch_task ();
