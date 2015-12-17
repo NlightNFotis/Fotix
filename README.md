@@ -1,5 +1,5 @@
 fotix is a unix like clone.  
-Copyright (c) 2013, 2014 Fotis Koutoulakis
+Copyright (c) 2013 - 2015 Fotis Koutoulakis
 
 Introduction
 ============
