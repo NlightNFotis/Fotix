@@ -10,7 +10,7 @@ RAMDISK_INIT=utils/mkinit.c
 CFLAGS=-nostdlib -nostdinc -fno-builtin -fno-stack-protector -m32 -I./
 LDFLAGS=-melf_i386 -Tlink.ld
 ASFLAGS=-felf
-CC=i586-elf-gcc
+CC=i586-linux-gnu-gcc
 
 all: $(SOURCES) link
 
