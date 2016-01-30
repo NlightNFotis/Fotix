@@ -1,5 +1,5 @@
 fotix is a unix like clone.  
-Copyright (c) 2013 - 2015 Fotis Koutoulakis
+Copyright (c) 2013 - 2016 Fotis Koutoulakis
 
 Introduction
 ============
@@ -18,9 +18,10 @@ Instructions
 
 ## Prerequisites
 
-To build fotix, you should have a cross-compiler. I personally used GCC-4.9 for
+To build fotix, you should have a cross-compiler. I personally used `GCC-4.9` for
 my development purposes, targeted at i586. It goes without saying that you 
-should also have binutils. You should also have nasm. 
+should also have `binutils`. You can get a basic toolchain installed by running
+the script at `utils/prepare_toolchain.sh`. You should also have `nasm`. 
 
 To build the iso, you should also have installed `grub-mkrescue` and `xorriso`.
 To run the iso, you can use any virtual machine hypervisor, although I personally
