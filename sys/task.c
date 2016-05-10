@@ -34,12 +34,13 @@ initialise_tasking ()
 
     /* XXX: Same as fork (); decouple maybe? */
     /* Initialise the first task (kernel task) */
-    current_task = ready_queue = (task_t *) kmalloc (sizeof (task_t));
-    current_task->id = next_pid++;
-    current_task->esp = current_task->ebp = 0;
-    current_task->eip = 0;
+    current_task = ready_queue   = (task_t *) kmalloc (sizeof (task_t));
+    current_task->id             = next_pid++;
+    current_task->esp            = 0;
+    current_task->ebp            = 0;
+    current_task->eip            = 0;
     current_task->page_directory = current_directory;
-    current_task->next = 0;
+    current_task->next           = 0;
 
     /* Reenable interrupts */
     asm volatile ("sti");
@@ -50,9 +51,7 @@ move_stack (void *new_stack_start, u32int size)
 {
   u32int i;
   /* Allocate some space for the new stack. */
-  for( i = (u32int)new_stack_start;
-       i >= ((u32int)new_stack_start-size);
-       i -= 0x1000)
+  for(i = (u32int) new_stack_start; i >= (u32int) new_stack_start - size; i -= 0x1000)
     {
       /* General-purpose stack is in user-mode. */
       alloc_frame( get_page(i, 1, current_directory), 0 /* User mode */, 1 /* Is writable */ );
@@ -196,27 +195,25 @@ fork ()
     task_t *parent_task = (task_t *) current_task;
 
     /* Clone the address space */
-    page_directory_t *directory = clone_directory (current_directory);
-
-    /* Create a new process. */
-    task_t *new_task = (task_t *) kmalloc (sizeof (task_t));
-
-    new_task->id = next_pid++;
-    new_task->esp = new_task->ebp = 0;
-    new_task->eip = 0;
+    page_directory_t *directory = clone_directory (current_directory); /* Create a new process. */ task_t *new_task = (task_t *) kmalloc (sizeof (task_t)); new_task->id             = next_pid++;
+    new_task->esp            = 0;
+    new_task->ebp            = 0;
+    new_task->eip            = 0;
     new_task->page_directory = directory;
-    new_task->next = 0;
+    new_task->next           = 0;
 
     /* Add it to the end of the ready queue
      * Find the end of the ready queue.
      */
     task_t *tmp_task = (task_t *) ready_queue;
-    while (tmp_task->next)
+    while (tmp_task->next) 
+      {
         tmp_task = tmp_task->next;
+      }
     tmp_task->next = new_task;
 
     /* This will be the new entry point for the new process. */
-    u32int eip = read_eip();
+    u32int eip = read_eip ();
 
 
     /* We could be the parent task, or the child task here - check. */

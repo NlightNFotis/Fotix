@@ -11,9 +11,9 @@
 
 static void syscall_handler (registers_t *regs);
 
-DEFN_SYSCALL1(monitor_write, 0, const char *);
-DEFN_SYSCALL1(monitor_write_hex, 1, const char *);
-DEFN_SYSCALL1(monitor_write_dec, 2, const char *);
+DEFN_SYSCALL1 (monitor_write, 0, const char *);
+DEFN_SYSCALL1 (monitor_write_hex, 1, const char *);
+DEFN_SYSCALL1 (monitor_write_dec, 2, const char *);
 
 static void *syscalls[3] =
 {

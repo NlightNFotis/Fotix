@@ -19,9 +19,13 @@ initrd_read (fs_node_t *node, u32int offset, u32int size, u8int *buffer)
     initrd_file_header_t header = file_headers[node->inode];
     
     if (offset > header.length)
+      {
         return 0;
+      }
     if (offset + size > header.length)
+      {
         size = header.length - offset;
+      }
 
     memcpy (buffer, (u8int *) (header.offset + offset), size);
 

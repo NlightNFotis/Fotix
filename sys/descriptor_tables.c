@@ -19,7 +19,7 @@ static void init_gdt ();
 static void init_idt ();
 static void gdt_set_gate (s32int, u32int, u32int, u8int, u8int);
 static void idt_set_gate (u8int, u32int, u16int, u8int);
-static void write_tss (s32int, u16int, u32int);
+static void write_tss    (s32int, u16int, u32int);
 
 gdt_entry_t gdt_entries[6];
 gdt_ptr_t   gdt_ptr;
@@ -42,14 +42,14 @@ init_descriptor_tables ()
     init_idt ();
 
 	/* Nullify all the interrupt handlers. */
-    memset(&interrupt_handlers, 0, sizeof(isr_t) * 256);
+    memset (&interrupt_handlers, 0, sizeof (isr_t) * 256);
 }
 
 static void 
 init_gdt ()
 {
     gdt_ptr.limit = (sizeof (gdt_entry_t) * 6) - 1;
-    gdt_ptr.base = (u32int) &gdt_entries;
+    gdt_ptr.base  = (u32int) &gdt_entries;
 
     /* Setting five segments. Notice that the only thing that
      * changes is the access byte. */
@@ -58,7 +58,7 @@ init_gdt ()
     gdt_set_gate (2, 0, 0xFFFFFFFF, 0x92, 0xCF);    /* Data segment */
     gdt_set_gate (3, 0, 0xFFFFFFFF, 0xFA, 0xCF);    /* User mode code segment */
     gdt_set_gate (4, 0, 0xFFFFFFFF, 0xF2, 0xCF);    /* User mode data segment */
-    write_tss (5, 0x10, 0x0);
+    write_tss    (5, 0x10, 0x0);
 
     gdt_flush ((u32int) &gdt_ptr);
     tss_flush ();
@@ -84,7 +84,7 @@ static void
 init_idt ()
 {
     idt_ptr.limit = sizeof (idt_entry_t) * 256 - 1;
-    idt_ptr.base = (u32int) &idt_entries;
+    idt_ptr.base  = (u32int) &idt_entries;
 
     memset (&idt_entries, 0, sizeof (idt_entry_t) * 256);
 
@@ -189,7 +189,7 @@ write_tss (s32int num, u16int ss0, u32int esp0)
      * RPL (requested privilege level) to 3, meaning that this TSS can be used
      * to switch to kernel mode from ring 3.
      */
-    tss_entry.cs    = 0x0b;
+    tss_entry.cs = 0x0b;
     tss_entry.ss = tss_entry.ds = tss_entry.es = tss_entry.fs = tss_entry.gs = 0x13;
 }
 

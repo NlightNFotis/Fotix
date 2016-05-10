@@ -12,8 +12,8 @@
 u16int *video_memory = (u16int *) 0xB8000;
 
 /* Store the cursor position */
-u8int cursor_x = 0,
-      cursor_y = 0;
+u8int cursor_x = 0;
+u8int cursor_y = 0;
 
 
 /* Update the hardware cursor. */
@@ -34,7 +34,7 @@ scroll ()
 {
     /* Get a space character with the default colour attributes. */
     u8int attributeByte = (0 /*black*/ << 4) | (15 /*white*/ &0x0F);
-    u16int blank = 0x20 /*space*/ | (attributeByte << 8);
+    u16int blank        = 0x20 /*space*/ | (attributeByte << 8);
 
     /* Row 25 is the end, this means we need to scroll up */
     if (cursor_y >= 25)
@@ -43,16 +43,16 @@ scroll ()
              * back in the buffer by a line */
             int counter;
             for (counter = 0; counter < 24 * 80; counter++)
-                {
-                    video_memory[counter] = video_memory[counter + 80];
-                }
+              {
+                video_memory[counter] = video_memory[counter + 80];
+              }
 
             /* The last line should now be a blank. Do this by writing
              * 80 spaces to it. */
             for (counter = 24 * 80; counter < 25 * 80; counter++)
-                {
-                    video_memory[counter] = blank;
-                }
+              {
+                video_memory[counter] = blank;
+              }
 
             /* The cursor should now be on the last line. */
             cursor_y = 24;
@@ -77,45 +77,45 @@ monitor_put (char c)
 
     /* Handle a backspace, by moving the cursor back one space */
     if (c == 0x08 /*backspace*/ && cursor_x)
-        {
+      {
         cursor_x--;
-        }
+      }
 
     /* Handle a tab, by increasing the cursor's X, but only to a point
      * where it is divisible by 8 */
     else if (c == 0x09 /*tab*/)
-        {
+      {
         cursor_x = (cursor_x + 8) & ~(8 - 1);
-        }
+      }
 
     /* Handle carriage return */
     else if (c == '\r')
-        {
+      {
         cursor_x = 0;
-        }
+      }
 
     /* Handle a newline by moving cursor back to left and increasing row */
     else if (c == '\n')
-        {
+      {
         cursor_x = 0;
         cursor_y++;
-        }
+      }
 
     /* Handle any other printable character. */
     else if (c >= ' ')
-        {
-        location = video_memory + (cursor_y * 80 + cursor_x);
+      {
+        location  = video_memory + (cursor_y * 80 + cursor_x);
         *location = c | attribute;
         cursor_x++;
-        }
+      }
 
     /* Check if we need to insert a new line because we have reached the end of 
      * the screen. */
     if (cursor_x >= 80)
-        {
-            cursor_x = 0;
-            cursor_y++;
-        }
+      {
+        cursor_x = 0;
+        cursor_y++;
+      }
 
     /* Scroll the screen if needed. */
     scroll ();
@@ -130,13 +130,13 @@ monitor_clear ()
 {
     /* Make an attribute byte for the default colours */
     u8int attributeByte = (0 /*black*/ << 4) | (15 /*white*/ &0x0F);
-    u16int blank = 0x20 /*space*/ | (attributeByte << 8);
+    u16int blank        = 0x20 /*space*/ | (attributeByte << 8);
 
     int counter;
     for (counter = 0; counter < 80 * 25; counter++)
-        {
-            video_memory[counter] = blank;
-        }
+      {
+        video_memory[counter] = blank;
+      }
 
     /* Move the hardware cursor back to the start. */
     cursor_x = 0;
@@ -150,9 +150,9 @@ monitor_write (char *c)
 {
     int counter = 0;
     while (c[counter])
-        {
-            monitor_put (c[counter++]);
-        }
+      {
+        monitor_put (c[counter++]);
+      }
 }
 
 void 
@@ -160,31 +160,30 @@ monitor_write_dec (u32int number)
 {
 
     if (number == 0)
-    {
+      {
         monitor_put ('0');
         return;
-    }
+      }
 
     s32int acc = number;
     char c[32];
     int i = 0;
     while (acc > 0)
-    {
+      {
         c[i] = '0' + acc % 10;
         acc /= 10;
         i++;
-    }
+      }
     c[i] = 0;
 
     char c2[32];
     c2[i--] = 0;
     int j = 0;
     while(i >= 0)
-    {
+      {
         c2[i--] = c[j++];
-    }
+      }
     monitor_write (c2);
-
 }
 
 void
@@ -198,32 +197,32 @@ monitor_write_hex (u32int number)
 
     int counter;
     for (counter = 28; counter > 0; counter -= 4)
-        {
-            temp = (number >> counter) & 0xF;
-            if (temp == 0 && noZeroes != 0)
-                {
-                    continue;
-                }
+      {
+        temp = (number >> counter) & 0xF;
+        if (temp == 0 && noZeroes != 0)
+          {
+            continue;
+          }
 
-            if (temp >= 0xA)
-                {
-                    noZeroes = 0;
-                    monitor_put (temp - 0xA + 'a');
-                }
-            else
-                {
-                    noZeroes = 0;
-                    monitor_put (temp + '0');
-                }
-        }
+        if (temp >= 0xA)
+          {
+            noZeroes = 0;
+            monitor_put (temp - 0xA + 'a');
+          }
+        else
+          {
+            noZeroes = 0;
+            monitor_put (temp + '0');
+          }
+      }
 
     temp = number & 0xF;
     if (temp >= 0xA)
-        {
-            monitor_put (temp - 0xA + 'a');
-        }
+      {
+        monitor_put (temp - 0xA + 'a');
+      }
     else
-        {
-            monitor_put (temp + '0');
-        }
+      {
+        monitor_put (temp + '0');
+      }
 }

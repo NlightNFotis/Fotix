@@ -133,12 +133,15 @@ keyboard_getchar ()
 {
     if (keyboard_buffer_start != keyboard_buffer_end)
       {
-          char c = keyboard_buffer[keyboard_buffer_start++];
-          /* Wrap to the start of the buffer if we went off the end. */
-          keyboard_buffer_start &= 255;
-          return c;
+        char c = keyboard_buffer[keyboard_buffer_start++];
+        /* Wrap to the start of the buffer if we went off the end. */
+        keyboard_buffer_start &= 255;
+        return c;
       }
-    else return '\0';
+    else
+      {
+        return '\0';
+      }
 }
 
 void
@@ -163,45 +166,51 @@ keyboard_handler (registers_t *regs)
           {
             if (current_layout->control_map[i] == (scancode & ~RELEASED_MASK))
               {
-                  /* Releasing the key always disables its functions */
-                  current_layout->controls &= ~(1 << i);
-                  return;
+                /* Releasing the key always disables its functions */
+                current_layout->controls &= ~(1 << i);
+                return;
               }
           }
       }
     else
       {
-          /* check if pressed key was a control key and 
-           * invert its bit in the status map
-           */
-          u32int i;
-          for (i = 0; i < 8; i++) {
-              if (current_layout->control_map[i] == scancode)
-                {
-                    /* if bit is set, delete it */
-                    if (current_layout->controls & 1 << i)
-                        current_layout->controls &= ~(1 << i);
-                    /* if not, set it */
-                    else
-                        current_layout->controls |= 1 << i;
+        /* check if pressed key was a control key and 
+         * invert its bit in the status map
+         */
+        u32int i;
+        for (i = 0; i < 8; i++)
+          {
+            if (current_layout->control_map[i] == scancode)
+              {
+                /* if bit is set, delete it */
+                if (current_layout->controls & 1 << i)
+                  {
+                    current_layout->controls &= ~(1 << i);
+                  }
+                else /* if not, set it */ 
+                  {
+                    current_layout->controls |= 1 << i;
                     return;
-                }
+                  }
+               }
           }
       
 
-          /* If it was a non-control key, just print it upper or lowercase version
-           * depending on the status of the control keys
-           */
-          u8int *scancodes = current_layout->scancodes;
-          if ((current_layout->controls & (LSHIFT | RSHIFT | CAPSLOCK))
-                && !(current_layout->controls & CONTROL))
-                scancodes = current_layout->shift_scancodes;
+        /* If it was a non-control key, just print it upper or lowercase version
+         * depending on the status of the control keys
+         */
+        u8int *scancodes = current_layout->scancodes;
+        if ((current_layout->controls & (LSHIFT | RSHIFT | CAPSLOCK))
+              && !(current_layout->controls & CONTROL))
+          {
+            scancodes = current_layout->shift_scancodes;
+          }
 
-          /* Avoid buffer overruns if possible. */
-          if (keyboard_buffer_end != keyboard_buffer_start - 1)
-            {
-                keyboard_buffer[keyboard_buffer_end++] = scancodes[scancode];
-                keyboard_buffer_end &= 255;
-            }
+        /* Avoid buffer overruns if possible. */
+        if (keyboard_buffer_end != keyboard_buffer_start - 1)
+          {
+            keyboard_buffer[keyboard_buffer_end++] = scancodes[scancode];
+            keyboard_buffer_end &= 255;
+          }
       }
 }
