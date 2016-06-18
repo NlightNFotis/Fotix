@@ -24,4 +24,7 @@ void monitor_write_dec (u32int number);
 /* Output a hexadecimal number on the monitor */
 void monitor_write_hex (u32int hex_number);
 
+/* Output a padded string (usefull in kernel logging) to the monitor */
+void monitor_write_padded (char *message, u8int success);
+
 #endif

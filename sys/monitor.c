@@ -23,7 +23,7 @@ move_cursor ()
     /* The screen is 80 characters wide... */
     u16int cursorLocation = cursor_y * 80 + cursor_x;
     outb (0x3D4, 14);                   /* Tell the VGA we are setting the high cursor byte. */
-    outb (0x3D5, cursorLocation >> 8); /* Send the high cursor byte. */
+    outb (0x3D5, cursorLocation >> 8);  /* Send the high cursor byte. */
     outb (0x3D4, 15);                   /* Tell the VGA board we are setting the low cursor byte */
     outb (0x3D5, cursorLocation);       /* Send the low cursor byte. */
 }
@@ -225,4 +225,42 @@ monitor_write_hex (u32int number)
       {
         monitor_put (temp + '0');
       }
+}
+
+void
+monitor_write_padded(char *message, u8int success)
+{
+    char buff[80];
+    u16int index;
+    // Get the length of the message
+    u16int strln = 0;
+    while (*message)
+      {
+        *(buff+strln) = *(message++);
+        strln++;
+      }
+
+    for (index = strln; index < 75; index++)
+      {
+        *(buff + index) = '.';
+      }
+
+    if (success)  // if the previous operation was successfull
+      {
+        buff[75] = '[';
+        buff[76] = 'O';
+        buff[77] = 'K';
+        buff[78] = ']';
+        buff[79] = '\n';
+      }
+    else
+      {
+        buff[75] = '[';
+        buff[76] = 'F';
+        buff[77] = 'L';
+        buff[78] = ']';
+        buff[79] = '\n';
+      }
+
+    monitor_write (buff);
 }

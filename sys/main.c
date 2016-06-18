@@ -18,6 +18,7 @@
 
 extern u32int placement_address;
 u32int initial_esp;
+u8int  success;
 
 /*
  * The kernel's entry point.
@@ -40,13 +41,20 @@ kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, pas
     monitor_clear ();
 
     monitor_write ("Fotix v0.1\n");
-    monitor_write ("Copyright (c) 2013 Fotis Koutoulakis\n");
+    monitor_write ("Copyright (c) 2016 Fotis Koutoulakis\n");
     monitor_write ("http://www.fotiskoutoulakis.com\n");
     monitor_put ('\n');
 
     /* Initialise all the ISRs and segmentation */
-    init_descriptor_tables ();
-    monitor_write ("Descriptor tables initialised!\n");
+    success = init_descriptor_tables ();
+    if (success == 0)
+      {
+        monitor_write_padded ("Initializing descriptor tables", 1);
+      }
+    else
+      {
+        monitor_write_padded ("Initializing descriptor tables", 0);
+      }
 
     /* Initialise the PIT to 100Hz */
     asm volatile ("sti");

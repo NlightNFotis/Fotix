@@ -157,7 +157,7 @@ extern void irq14 ();
 extern void irq15 ();
 
 /* Initialisation function is publicly accessible. */
-void init_descriptor_tables ();
+u8int init_descriptor_tables ();
 
 /* Allows the kernel stack in the TSS to be changed. */
 void set_kernel_stack (u32int stack);
