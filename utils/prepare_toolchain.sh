@@ -10,7 +10,7 @@ GCC_VERSION=4.8.2
 BINUTILS_VERSION=2.24
 DIR="temp/"
 PREFIX="$HOME/opt/cross"
-TARGET=i586-elf
+TARGET=i686-elf
 PATH="$PREFIX/bin:$PATH"
 
 mkdir $DIR
@@ -57,7 +57,8 @@ echo "Preparing to build binutils"
 echo
 mkdir binutils-build
 pushd binutils-build
-../binutils/configure --target=$TARGET --prefix="$PREFIX" --disable-nls
+../binutils/configure --target=$TARGET --prefix="$PREFIX" --disable-nls \
+ --with-sysroot --disable-werror
 make -j4
 make install
 popd

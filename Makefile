@@ -1,5 +1,5 @@
 # Makefile for fotix
-# Copyright (c) 2013 Fotis Koutoulakis
+# Copyright (c) 2016 Fotis Koutoulakis
 
 SOURCES=sys/boot.o sys/main.o sys/common.o sys/monitor.o sys/descriptor_tables.o \
 	sys/isr.o sys/interrupt.o sys/dt_asm.o sys/timer.o sys/kheap.o sys/paging.o \
@@ -10,7 +10,7 @@ RAMDISK_INIT=utils/mkinit.c
 CFLAGS=-nostdlib -nostdinc -fno-builtin -fno-stack-protector -ffreestanding -m32 -I./
 LDFLAGS=-melf_i386 -Tlink.ld
 ASFLAGS=-felf
-CC=i586-linux-gnu-gcc
+CC=i686-elf-gcc
 
 all: $(SOURCES) link
 
