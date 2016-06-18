@@ -58,29 +58,66 @@ kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, pas
 
     /* Initialise the PIT to 100Hz */
     asm volatile ("sti");
-    init_timer (50);
-    monitor_write ("Timer initialised!\n");
+    success = init_timer (50);
+    if (success == 0)
+      {
+        monitor_write_padded ("Initializing timer", 1);
+      }
+    else
+      {
+        monitor_write_padded ("Initializing timer", 0);
+      }
 
     /* Find the location of our initial ramdisk. */
     ASSERT(mboot_ptr->mods_count > 0);
     u32int initrd_location = *((u32int *) mboot_ptr->mods_addr);
     u32int initrd_end      = *(u32int *) (mboot_ptr->mods_addr + 4);
-    monitor_write ("Initial ramdisk found!\n");
+    monitor_write_padded ("Looking for initial ramdisk", 1);
 
     /* Don't trample our module with placement accesses, please! */
     placement_address = initrd_end;
 
     /*  Initialise paging. */
-    initialise_paging ();
-    monitor_write ("Paging initialised!\n"); 
+    success = initialise_paging ();
+    if (success == 0)
+      {
+        monitor_write_padded ("Initializing paging", 1); 
+      }
+    else
+      {
+        monitor_write_padded ("Initializing paging", 0);
+      }
 
     /* Initialise multitasking */
-    initialise_tasking ();
-    monitor_write ("Multitasking system initialised!\n");
+    success = initialise_tasking ();
+    if (success == 0)
+      {
+        monitor_write_padded ("Initializing scheduling", 1);
+      }
+    else
+      {
+        monitor_write_padded ("Initializing scheduling", 0);
+      }
 
     /* Initialise the initial ramdisk, and set it as the filesystem root. */
     fs_root = initialise_initrd (initrd_location);
-    monitor_write ("Ramdisk initialised!\n");
+    if (!fs_root)
+      {
+        success = 1;
+      }
+    else
+      {
+        success = 0;
+      }
+
+    if (success == 0)
+      {
+        monitor_write_padded ("Initializing ramdisk", 1);
+      }
+    else
+      {
+        monitor_write_padded ("Initializing ramdisk", 0);
+      }
 
     initialise_syscalls();
     monitor_write ("Syscall interface initialised!\n");

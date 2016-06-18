@@ -26,4 +26,7 @@ u16int  inw  (u16int port);
 extern void panic        (const char *message, const char *file, u32int line);
 extern void panic_assert (const char *file, u32int line, const char *desc);
 
+#define EXIT_SUCCESS 0
+#define EXIT_FAILURE 1
+
 #endif

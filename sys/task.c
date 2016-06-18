@@ -23,7 +23,7 @@ extern u32int read_eip();
 /* The next available process ID */
 u32int next_pid = 1;
 
-void 
+u8int 
 initialise_tasking ()
 {
     /* This is very important, and should not be interrupted */
@@ -44,6 +44,8 @@ initialise_tasking ()
 
     /* Reenable interrupts */
     asm volatile ("sti");
+
+    return EXIT_SUCCESS;
 }
 
 void 

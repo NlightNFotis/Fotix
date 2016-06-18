@@ -15,8 +15,8 @@ extern void idt_flush (u32int);
 extern void tss_flush ();
 
 /* Internal function prototypes. */
-static void init_gdt ();
-static void init_idt ();
+static u8int init_gdt ();
+static u8int init_idt ();
 static void gdt_set_gate (s32int, u32int, u32int, u8int, u8int);
 static void idt_set_gate (u8int, u32int, u16int, u8int);
 static void write_tss    (s32int, u16int, u32int);
@@ -35,19 +35,30 @@ extern isr_t interrupt_handlers[];
 u8int
 init_descriptor_tables ()
 {
+    u8int success = 0;
+
     /* Initialise the Global Descriptor Table. */
-    init_gdt ();
+    success = init_gdt ();
+    if (success != 0)
+      {
+        return EXIT_FAILURE;
+      }
 
     /* Initialise the Interrupt Descriptor Table. */
-    init_idt ();
+    success = init_idt ();
+    if (success != 0)
+      {
+        return EXIT_FAILURE;
+      }
 
     /* Nullify all the interrupt handlers. */
     memset (&interrupt_handlers, 0, sizeof (isr_t) * 256);
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
-static void 
+// TODO: Implement finer error reporting
+static u8int 
 init_gdt ()
 {
     gdt_ptr.limit = (sizeof (gdt_entry_t) * 6) - 1;
@@ -64,6 +75,8 @@ init_gdt ()
 
     gdt_flush ((u32int) &gdt_ptr);
     tss_flush ();
+
+    return EXIT_SUCCESS;
 }
 
 /* Set the value of one GDT entry. */
@@ -79,10 +92,11 @@ gdt_set_gate (s32int num, u32int base, u32int limit,
     gdt_entries[num].granularity = (limit >> 16) & 0x0F;
 
     gdt_entries[num].granularity |= gran & 0xF0;
-    gdt_entries[num].access      = access;
+    gdt_entries[num].access       = access;
 }
 
-static void
+// TODO: Implement finer error reporting
+static u8int
 init_idt ()
 {
     idt_ptr.limit = sizeof (idt_entry_t) * 256 - 1;
@@ -153,6 +167,8 @@ init_idt ()
     idt_set_gate (128,(u32int) isr128, 0x08, 0x8E);
 
     idt_flush ((u32int) &idt_ptr);
+
+    return EXIT_SUCCESS;
 }
 
 static void

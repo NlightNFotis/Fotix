@@ -4,6 +4,7 @@
  * timer.c -- Initialises the PIT, and handles clock updates.
  */
 
+#include "include/common.h"
 #include "include/timer.h"
 #include "include/isr.h"
 #include "include/monitor.h"
@@ -18,7 +19,7 @@ timer_callback (registers_t *reg)
     switch_task ();
 }
 
-void
+u8int
 init_timer (u32int frequency)
 {
     /* Firstly register our timer callback. */
@@ -39,4 +40,6 @@ init_timer (u32int frequency)
     /* Send the frequency divisor */
     outb (0x40, lower);
     outb (0x40, upper);
+
+    return EXIT_SUCCESS;
 }

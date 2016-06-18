@@ -121,7 +121,7 @@ free_frame (page_t *page)
 }
 
 /* Code for paging initialisation */
-void 
+u8int 
 initialise_paging ()
 {
     /* The size of physical memory. For the moment we assume it is 16MB big */
@@ -180,6 +180,8 @@ initialise_paging ()
 
     current_directory = clone_directory (kernel_directory);
     switch_page_directory (current_directory);
+
+    return EXIT_SUCCESS;
 }
 
 void
