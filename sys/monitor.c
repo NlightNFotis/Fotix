@@ -33,8 +33,8 @@ static void
 scroll ()
 {
     /* Get a space character with the default colour attributes. */
-    u8int attributeByte = (0 /*black*/ << 4) | (15 /*white*/ &0x0F);
-    u16int blank        = 0x20 /*space*/ | (attributeByte << 8);
+    u8int  attributeByte = (0 /*black*/ << 4) | (15 /*white*/ &0x0F);
+    u16int blank         = 0x20 /*space*/ | (attributeByte << 8);
 
     /* Row 25 is the end, this means we need to scroll up */
     if (cursor_y >= 25)

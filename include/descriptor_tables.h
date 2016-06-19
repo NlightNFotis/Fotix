@@ -53,13 +53,13 @@ typedef struct tss_entry_struct tss_entry_t;
 /* This structure contains the value of one GDT entry. */
 struct gdt_entry_struct
 {
-    u16int limit_low;       /* The lower 16 bits of the limit */
-    u16int base_low;        /* The lower 16 bits of the base */
+    u16int limit_low;        /* The lower 16 bits of the limit */
+    u16int base_low;         /* The lower 16 bits of the base */
     u8int  base_middle;      /* The next 8 bits of the base */
     u8int  access;           /* Access flags, determine what ring this segment can be used in */
     u8int  granularity;
     u8int  base_high;        /* The last 8 bits of the base */
-} __attribute__((packed)); /* Used to tell GCC not to change the alignment in the structure */
+} __attribute__((packed));   /* Used to tell GCC not to change the alignment in the structure */
 
 /* To tell the processor where to find our GDT, we have to
  * give it the address of this structure.
@@ -74,7 +74,7 @@ struct gdt_ptr_struct
 } __attribute__((packed));
 
 typedef struct gdt_entry_struct gdt_entry_t;
-typedef struct gdt_ptr_struct gdt_ptr_t;
+typedef struct gdt_ptr_struct   gdt_ptr_t;
 
 /*
  * ---------------------------------
@@ -85,11 +85,11 @@ typedef struct gdt_ptr_struct gdt_ptr_t;
 /* A struct defining an interrupt gate. */
 struct idt_entry_struct
 {
-    u16int base_lo;     /* The lower 16bits of the address to jump to when this interrupt fires */
-    u16int sel;         /* The kernel segment selector. */
+    u16int base_lo;          /* The lower 16bits of the address to jump to when this interrupt fires */
+    u16int sel;              /* The kernel segment selector. */
     u8int  always_zero;      /* This must always be zero. */
     u8int  flags;        
-    u16int base_hi;     /* The upper 16 bits of the address to jump to. */
+    u16int base_hi;          /* The upper 16 bits of the address to jump to. */
 } __attribute__((packed));
 
 /* A struct describing a pointer to an array of interrupt handlers.

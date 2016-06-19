@@ -5,6 +5,7 @@
  * a system call system.
  */
 
+#include "include/common.h"
 #include "include/syscall.h"
 #include "include/isr.h"
 #include "include/monitor.h"
@@ -24,11 +25,12 @@ static void *syscalls[3] =
 
 u32int num_syscalls = 3;
 
-void
+u8int
 initialise_syscalls ()
 {
     /* Register our syscall handler. */
     register_interrupt_handler (0x80, &syscall_handler);
+    return EXIT_SUCCESS;
 }
 
 void

@@ -119,16 +119,23 @@ kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, pas
         monitor_write_padded ("Initializing ramdisk", 0);
       }
 
-    initialise_syscalls();
-    monitor_write ("Syscall interface initialised!\n");
+    success = initialise_syscalls();
+    if (success == 0)
+      {
+        monitor_write_padded ("Initializing kernel system call interface", 1);
+      }
+    else
+      {
+        monitor_write_padded ("Initializing kernel system call interface", 0);
+      }
 
     init_keyboard_driver ();
-    for (;;)
+/*    for (;;)
        {
            char c = keyboard_getchar ();
            if (c)
                monitor_put (c);
-       }
+       }*/
 
     switch_to_user_mode();
 

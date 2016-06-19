@@ -69,6 +69,6 @@ DECL_SYSCALL1(monitor_write, const char *)
 DECL_SYSCALL1(monitor_write_hex, const char *)
 DECL_SYSCALL1(monitor_write_hex, const char *)
 
-void initialise_syscalls ();
+u8int initialise_syscalls ();
 
 #endif

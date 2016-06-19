@@ -40,4 +40,7 @@ void move_stack (void *new_stack_start, u32int size);
 /* Returns the pid of the current process */
 int getpid ();
 
+/* Make the switch from kernel mode to userspace mode */
+void switch_to_user_mode ();
+
 #endif
