@@ -18,7 +18,7 @@
 
 extern u32int placement_address;
 u32int initial_esp;
-u8int  success;
+u8int  failure;
 
 /*
  * The kernel's entry point.
@@ -46,8 +46,8 @@ kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, pas
     monitor_put ('\n');
 
     /* Initialise all the ISRs and segmentation */
-    success = init_descriptor_tables ();
-    if (success == 0)
+    failure = init_descriptor_tables ();
+    if (!failure)
       {
         monitor_write_padded ("Initializing descriptor tables", 1);
       }
@@ -58,8 +58,8 @@ kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, pas
 
     /* Initialise the PIT to 100Hz */
     asm volatile ("sti");
-    success = init_timer (50);
-    if (success == 0)
+    failure = init_timer (50);
+    if (!failure)
       {
         monitor_write_padded ("Initializing timer", 1);
       }
@@ -78,8 +78,8 @@ kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, pas
     placement_address = initrd_end;
 
     /*  Initialise paging. */
-    success = initialise_paging ();
-    if (success == 0)
+    failure = initialise_paging ();
+    if (!failure)
       {
         monitor_write_padded ("Initializing paging", 1); 
       }
@@ -89,8 +89,8 @@ kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, pas
       }
 
     /* Initialise multitasking */
-    success = initialise_tasking ();
-    if (success == 0)
+    failure = initialise_tasking ();
+    if (!failure)
       {
         monitor_write_padded ("Initializing scheduling", 1);
       }
@@ -103,14 +103,14 @@ kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, pas
     fs_root = initialise_initrd (initrd_location);
     if (!fs_root)
       {
-        success = 1;
+        failure = 1;
       }
     else
       {
-        success = 0;
+        failure = 0;
       }
 
-    if (success == 0)
+    if (!failure)
       {
         monitor_write_padded ("Initializing ramdisk", 1);
       }
@@ -119,8 +119,8 @@ kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, pas
         monitor_write_padded ("Initializing ramdisk", 0);
       }
 
-    success = initialise_syscalls();
-    if (success == 0)
+    failure = initialise_syscalls();
+    if (!failure)
       {
         monitor_write_padded ("Initializing kernel system call interface", 1);
       }
@@ -130,16 +130,17 @@ kernel_start (struct multiboot *mboot_ptr, /* Initial multiboot information, pas
       }
 
     init_keyboard_driver ();
-/*    for (;;)
-       {
-           char c = keyboard_getchar ();
-           if (c)
-               monitor_put (c);
-       }*/
 
     switch_to_user_mode();
 
     syscall_monitor_write("Hello, user world!\n");
+
+    for (;;)
+       {
+           char c = keyboard_getchar ();
+           if (c)
+               monitor_put (c);
+       }
 
     return 0xdeadbeef;
 }
