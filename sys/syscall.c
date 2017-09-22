@@ -5,37 +5,37 @@
  * a system call system.
  */
 
-#include "include/common.h"
-#include "include/syscall.h"
-#include "include/isr.h"
-#include "include/monitor.h"
+#include "common.h"
+#include "syscall.h"
+#include "isr.h"
+#include "monitor.h"
 
-static void syscall_handler (registers_t *regs);
+static void syscall_handler(registers_t *regs);
 
 DEFN_SYSCALL1 (monitor_write, 0, const char *);
+
 DEFN_SYSCALL1 (monitor_write_hex, 1, const char *);
+
 DEFN_SYSCALL1 (monitor_write_dec, 2, const char *);
 
 static void *syscalls[3] =
-{
-    &monitor_write,
-    &monitor_write_hex,
-    &monitor_write_dec,
-};
+        {
+                &monitor_write,
+                &monitor_write_hex,
+                &monitor_write_dec,
+        };
 
 u32int num_syscalls = 3;
 
 u8int
-initialise_syscalls ()
-{
+initialise_syscalls() {
     /* Register our syscall handler. */
-    register_interrupt_handler (0x80, &syscall_handler);
+    register_interrupt_handler(0x80, &syscall_handler);
     return EXIT_SUCCESS;
 }
 
 void
-syscall_handler (registers_t *regs)
-{
+syscall_handler(registers_t *regs) {
     /* Firstly, check if the requested syscall number is valid.
      * The syscall number can be found in EAX.
      */

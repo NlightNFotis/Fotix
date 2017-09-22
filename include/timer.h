@@ -10,6 +10,6 @@
 
 #include "common.h"
 
-u8int init_timer (u32int frequency);
+u8int init_timer(u32int frequency);
 
 #endif

@@ -5,16 +5,16 @@
  * and also calls initialisation routines.
  */
 
-#include "include/monitor.h"
-#include "include/descriptor_tables.h"
-#include "include/timer.h"
-#include "include/paging.h"
-#include "include/multiboot.h"
-#include "include/fs.h"
-#include "include/initrd.h"
-#include "include/task.h"
-#include "include/syscall.h"
-#include "include/keyboard.h"
+#include "monitor.h"
+#include "descriptor_tables.h"
+#include "timer.h"
+#include "paging.h"
+#include "multiboot.h"
+#include "fs.h"
+#include "initrd.h"
+#include "task.h"
+#include "syscall.h"
+#include "keyboard.h"
 
 extern u32int placement_address;
 u32int initial_esp;

@@ -19,21 +19,18 @@
 #define HEAP_MIN_SIZE       0x70000
 
 /* Size information for a hole/block */
-typedef struct
-{
+typedef struct {
     u32int magic;   /* Magic number, used for error checking and identification */
     u8int is_hole;  /* 1 if this is a hole, 0 if this is a block */
     u32int size;    /* size of the block, including the end footer. */
 } header_t;
 
-typedef struct
-{
+typedef struct {
     u32int magic;       /* Magic number, same as in header_t */
     header_t *header;   /* Pointer to the block header */
 } footer_t;
 
-typedef struct
-{
+typedef struct {
     ordered_array_t index;
     u32int start_address;   /* The start of our allocated space */
     u32int end_address;     /* The end of our allocated space. May be expanded up to max_address */
@@ -50,33 +47,33 @@ typedef struct
  * parameter representations are available in kmalloc, kmalloc_a,
  * kmalloc_ap, kmalloc_p
  */
-u32int kmalloc_int (u32int sz, int align, u32int *phys);
+u32int kmalloc_int(u32int sz, int align, u32int *phys);
 
 /* Allocate a chunk of memory, sz in size. The chunk must be page aligned */
-u32int kmalloc_a (u32int sz);
+u32int kmalloc_a(u32int sz);
 
 /* Allocate a chunk of memory, sz in size. The physical address
  * is returned in phys. Phys MUST be a valid pointer to u32int */
-u32int kmalloc_p (u32int sz, u32int *phys);
+u32int kmalloc_p(u32int sz, u32int *phys);
 
 /* Allocate a chunk of memory, sz in size. Thy physical address
  * is returned in phys. It must be page aligned. */
-u32int kmalloc_ap (u32int sz, u32int *phys);
+u32int kmalloc_ap(u32int sz, u32int *phys);
 
 /* General allocation function */
-u32int kmalloc (u32int sz);
+u32int kmalloc(u32int sz);
 
 /* General deallocation function. */
-void kfree (void *p);
+void kfree(void *p);
 
 /* Create a new heap. */
-heap_t *create_heap (u32int start, u32int end, u32int max, u8int supervisor, u8int readonly);
+heap_t *create_heap(u32int start, u32int end, u32int max, u8int supervisor, u8int readonly);
 
 /* Allocates a contiguous region of memory 'size' in size. If page_align == 1, it 
  * creates that block starting on a page boundary */
-void *alloc (u32int size, u8int page_align, heap_t *heap);
+void *alloc(u32int size, u8int page_align, heap_t *heap);
 
 /* Releases a block allocated with 'alloc' */
-void free (void *p, heap_t *heap);
+void free(void *p, heap_t *heap);
 
 #endif

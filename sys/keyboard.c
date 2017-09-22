@@ -5,7 +5,7 @@
  * keyboard driver.
  */
 
-#include "include/keyboard.h"
+#include "keyboard.h"
 
  keymap_t us = {
    {

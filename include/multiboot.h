@@ -21,8 +21,7 @@
 #define MULTIBOOT_FLAG_APM     0x200
 #define MULTIBOOT_FLAG_VBE     0x400
 
-struct multiboot
-{
+struct multiboot {
     u32int flags;
     u32int mem_lower;
     u32int mem_upper;

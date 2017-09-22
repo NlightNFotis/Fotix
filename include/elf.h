@@ -30,12 +30,12 @@ typedef s32int Elf32_Sword;
 
 
 /* The first 16 bytes of the file, serving to identify it. */
-#define SIZE_ELF_IDENT 16 
+#define SIZE_ELF_IDENT 16
 
 /* ELF file magic */
-#define ELFMAG0     0x7 
-#define ELFMAG1     'E' 
-#define ELFMAG2     'L' 
+#define ELFMAG0     0x7
+#define ELFMAG1     'E'
+#define ELFMAG2     'L'
 #define ELFMAG3     'F'
 
 /* The following are used in elf.c for elf file
@@ -48,10 +48,9 @@ typedef s32int Elf32_Sword;
 #define ELF_RELOC_ERR -1
 
 /** ELF file header **/
-typedef struct
-{
+typedef struct {
     /* Initial bytes of the file mark it as an object file. */
-    u8int  elf_ident[SIZE_ELF_IDENT];
+    u8int elf_ident[SIZE_ELF_IDENT];
 
     /* This member identifies the object file type */
     Elf32_Half elf_type;
@@ -97,8 +96,7 @@ typedef struct
     Elf32_Half elf_shstrndx;
 } Elf32_elfhdr;
 
-enum elf_identification
-{
+enum elf_identification {
     EI_MAG0,       /* 0x7F */
     EI_MAG1,       /* 'E'  */
     EI_MAG2,       /* 'L'  */
@@ -107,23 +105,21 @@ enum elf_identification
     EI_DATA,       /* Byte order */
     EI_VERSION,    /* ELF version */
     EI_OSABI,      /* OS specific */
-    EI_ABIVERSION  /* OS specific */
+    EI_ABIVERSION, /* OS specific */
     EI_PAD         /* Padding */
 };
 
-enum elf_file_type
-{
+enum elf_file_type {
     ET_NONE,    /* Unknown type */
     ET_REL,     /* Relocatable file */
     ET_EXEC     /* Executable file */
 };
 
 /** Program header **/
-typedef struct 
-{
+typedef struct {
     /* This tells what kind of segment this array element describes */
     u32int p_type;
-    
+
     /* This gives us the offset from the beginning of the file at which
      * the first byte of the segment resides */
     u32int p_offset;
@@ -141,7 +137,7 @@ typedef struct
 
     /* This gives us the number of bytes in the memory image of the segment */
     u32int p_memsz;
-    
+
     /* This gives us flags relevant to the segment */
     u32int p_flags;
 
@@ -150,61 +146,55 @@ typedef struct
 } Elf32_proghdr;
 
 /** Section header **/
-typedef struct 
-{
-    Elf32_Word  sh_name;
-    Elf32_Word  sh_type;
-    Elf32_Word  sh_flags;
-    Elf32_Addr  sh_addr;
-    Elf32_Off   sh_offset;
-    Elf32_Word  sh_size;
-    Elf32_Word  sh_link;
-    Elf32_Word  sh_info;
-    Elf32_Word  sh_addralign;
-    Elf32_Word  sh_entsize;
+typedef struct {
+    Elf32_Word sh_name;
+    Elf32_Word sh_type;
+    Elf32_Word sh_flags;
+    Elf32_Addr sh_addr;
+    Elf32_Off sh_offset;
+    Elf32_Word sh_size;
+    Elf32_Word sh_link;
+    Elf32_Word sh_info;
+    Elf32_Word sh_addralign;
+    Elf32_Word sh_entsize;
 } Elf32_shdr;
 
 #define SHN_UNDEF   (0x00) /* Undefined/ Not present */
 
-enum sht_types
-{
-    SHT_NULL        = 0,    /* Null section */
-    SHT_PROGBITS    = 1,    /* Program information */
-    SHT_SYMTAB      = 2,    /* Symbol table */
-    SHT_STRTAB      = 3,    /* String table */
-    SHT_RELA        = 4,    /* Relocation (w/ addend) */
-    SHT_NOBITS      = 8,    /* Not present in the file */
-    SHT_REL         = 9     /* Relocation (no addend) */
+enum sht_types {
+    SHT_NULL = 0,    /* Null section */
+    SHT_PROGBITS = 1,    /* Program information */
+    SHT_SYMTAB = 2,    /* Symbol table */
+    SHT_STRTAB = 3,    /* String table */
+    SHT_RELA = 4,    /* Relocation (w/ addend) */
+    SHT_NOBITS = 8,    /* Not present in the file */
+    SHT_REL = 9     /* Relocation (no addend) */
 };
 
-enum sht_attributes
-{
-    SHF_WRITE   = 0x01, /* Writeable section */
-    SHF_ALLOC   = 0x02  /* Exists in memory */
+enum sht_attributes {
+    SHF_WRITE = 0x01, /* Writeable section */
+    SHF_ALLOC = 0x02  /* Exists in memory */
 };
 
-typedef struct
-{
-    Elf32_Word  st_name;
-    Elf32_Addr  st_value;
-    Elf32_Word  st_size;
-    u8int       st_info
-    u8int       st_other;
-    Elf32_Half  st_shndx;
+typedef struct {
+    Elf32_Word st_name;
+    Elf32_Addr st_value;
+    Elf32_Word st_size;
+    u8int st_info;
+    u8int st_other;
+    Elf32_Half st_shndx;
 } Elf32_sym;
 
 #define ELF32_ST_BIND(INFO) ((INFO >> 4))
 #define ELF32_ST_TYPE(INFO) ((INFO) & 0x0F)
 
-enum StT_Bindings
-{
+enum StT_Bindings {
     STB_LOCAL,  /* Local Scope */
     STB_GLOBAL, /* Global Scope */
     STB_WEAK    /* Weak (ie. __attribute__ ((weak))) */
 };
 
-enum StT_Types
-{
+enum StT_Types {
     STT_NOTYPE,  /* No Type */
     STT_OBJECT,  /* Variables, arrays, etc. */
     STT_FUNC     /* Methods or functions */
@@ -212,8 +202,8 @@ enum StT_Types
 
 /* Relocation sections */
 typedef struct {
-    Elf32_Addr  r_offset;
-    Elf32_Word  r_info;
+    Elf32_Addr r_offset;
+    Elf32_Word r_info;
     Elf32_Sword r_addend;
 } Elf32_Rel;
 

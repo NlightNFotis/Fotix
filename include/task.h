@@ -16,9 +16,9 @@
 typedef struct task
 {
     int id;                             /* Process ID. */
-    u32int esp,                         /* Extended stack pointer. */ 
-           ebp,                         /* Extended base pointer. */
-           eip;                         /* Extended instruction pointer. */
+    u32int esp;                         /* Extended stack pointer. */
+    u32int ebp;                         /* Extended base pointer. */
+    u32int eip;                         /* Extended instruction pointer. */
     page_directory_t *page_directory;   /* Page directory for this task. */
     u32int kernel_stack;                /* Kernel stack location. */
     struct task *next;                  /* The next task in a linked list. */

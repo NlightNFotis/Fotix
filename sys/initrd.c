@@ -2,7 +2,7 @@
  * Copyright (c) 2013 Fotis Koutoulakis
  */
 
-#include "include/initrd.h"
+#include "initrd.h"
 
 initrd_header_t         *initrd_header;         /* The header. */
 initrd_file_header_t    *file_headers;          /* The list of file headers. */

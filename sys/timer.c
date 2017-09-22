@@ -4,11 +4,10 @@
  * timer.c -- Initialises the PIT, and handles clock updates.
  */
 
-#include "include/common.h"
-#include "include/timer.h"
-#include "include/isr.h"
-#include "include/monitor.h"
-#include "include/task.h"
+#include "common.h"
+#include "timer.h"
+#include "isr.h"
+#include "task.h"
 
 u32int tick = 0;
 
